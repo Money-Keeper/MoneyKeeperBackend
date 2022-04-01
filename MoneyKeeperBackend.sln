@@ -5,6 +5,10 @@ VisualStudioVersion = 17.1.32319.34
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MoneyKeeper", "MoneyKeeper\MoneyKeeper.csproj", "{DD086637-6DF5-4518-AA5C-686F9F87F098}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MoneyKeeper.Domain", "MoneyKeeper.Domain\MoneyKeeper.Domain.csproj", "{641274F9-F98B-42CD-8AA1-656BC2C808FE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MoneyKeeper.Data", "MoneyKeeper.Data\MoneyKeeper.Data.csproj", "{28D05521-4EB9-453B-BCFD-FC3FC4CA957B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +19,14 @@ Global
 		{DD086637-6DF5-4518-AA5C-686F9F87F098}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DD086637-6DF5-4518-AA5C-686F9F87F098}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DD086637-6DF5-4518-AA5C-686F9F87F098}.Release|Any CPU.Build.0 = Release|Any CPU
+		{641274F9-F98B-42CD-8AA1-656BC2C808FE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{641274F9-F98B-42CD-8AA1-656BC2C808FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{641274F9-F98B-42CD-8AA1-656BC2C808FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{641274F9-F98B-42CD-8AA1-656BC2C808FE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{28D05521-4EB9-453B-BCFD-FC3FC4CA957B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{28D05521-4EB9-453B-BCFD-FC3FC4CA957B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{28D05521-4EB9-453B-BCFD-FC3FC4CA957B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{28D05521-4EB9-453B-BCFD-FC3FC4CA957B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
