@@ -24,7 +24,7 @@ public class Mapper : IMapper
         if (!_configuration.Maps.ContainsKey(mapName))
             throw new MapperException(sourceType, targetType);
 
-        TTarget target = Activator.CreateInstance<TTarget>();
+        TTarget target = new TTarget();
 
         Copy(source, target, mapName);
 
@@ -50,7 +50,7 @@ public class Mapper : IMapper
 
         foreach (TSource value in source)
         {
-            TTarget target = Activator.CreateInstance<TTarget>();
+            TTarget target = new TTarget();
 
             Copy(value, target, mapName);
 

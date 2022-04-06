@@ -18,14 +18,14 @@ public class ExpenseService : IExpenseService
 
     public async Task<ExpenseDto?> GetAsync(Guid id)
     {
-        Expense? result = await _expenseRepository.Get(id);
+        Expense? result = await _expenseRepository.GetAsync(id);
 
         return _mapper.Map<Expense, ExpenseDto>(result);
     }
 
     public async Task<DataResult<ExpenseDto>> GetAsync()
     {
-        IEnumerable<Expense> result = await _expenseRepository.Get();
+        IEnumerable<Expense> result = await _expenseRepository.GetAsync();
         IEnumerable<ExpenseDto> resultDto = _mapper.Map<Expense, ExpenseDto>(result);
 
         return new DataResult<ExpenseDto>(resultDto);
