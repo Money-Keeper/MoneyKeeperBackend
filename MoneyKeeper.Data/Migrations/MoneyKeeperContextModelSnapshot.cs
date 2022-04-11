@@ -22,6 +22,41 @@ namespace MoneyKeeper.Data.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("MoneyKeeper.Domain.Data.Models.Currency", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(3)
+                        .HasColumnType("character varying(3)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("now()");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("ModifiedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("character varying(32)");
+
+                    b.Property<char>("Symbol")
+                        .HasColumnType("character(1)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Currencies");
+                });
+
             modelBuilder.Entity("MoneyKeeper.Domain.Data.Models.Expense", b =>
                 {
                     b.Property<Guid>("Id")
@@ -35,6 +70,9 @@ namespace MoneyKeeper.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
                         .HasDefaultValueSql("now()");
+
+                    b.Property<Guid>("CurrencyId")
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("Date")
                         .HasColumnType("timestamp with time zone");
@@ -50,7 +88,20 @@ namespace MoneyKeeper.Data.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CurrencyId");
+
                     b.ToTable("Expenses");
+                });
+
+            modelBuilder.Entity("MoneyKeeper.Domain.Data.Models.Expense", b =>
+                {
+                    b.HasOne("MoneyKeeper.Domain.Data.Models.Currency", "Currency")
+                        .WithMany()
+                        .HasForeignKey("CurrencyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Currency");
                 });
 #pragma warning restore 612, 618
         }

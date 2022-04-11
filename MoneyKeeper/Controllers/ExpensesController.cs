@@ -7,6 +7,7 @@ namespace MoneyKeeper.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Produces("application/json")]
 public class ExpensesController : ControllerBase
 {
     private readonly IExpenseService _expenseService;

@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MoneyKeeper.Data;
 using MoneyKeeper.Data.Repositories;
+using MoneyKeeper.Domain.AutoMapper;
 using MoneyKeeper.Domain.Data.Repositories;
-using MoneyKeeper.Domain.Mappers;
 using MoneyKeeper.Domain.Providers;
 using MoneyKeeper.Domain.Services;
 
@@ -15,14 +15,20 @@ internal static class AppBuilderConfiguration
         builder.Services.AddControllers();
 
         builder.Services
-            .AddDbContext<MoneyKeeperContext>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnectionString")))
-            .AddSingleton<IMapperConfiguration, MapperConfiguration>(_ => new MapperConfigurationFactory().CreateMapperConfiguration())
-            .AddSingleton<IMapper, Mapper>()
-            .AddTransient<IDateTimeProvider, DateTimeProvider>()
-            .AddScoped<IExpenseRepository, ExpenseRepository>()
-            .AddScoped<IExpenseService, ExpenseService>()
             .AddEndpointsApiExplorer()
-            .AddSwaggerGen();
+            .AddSwaggerGen(options => options.SchemaGeneratorOptions.SupportNonNullableReferenceTypes = true);
+
+        IMapperConfiguration mapperConfiguration = new MapperConfigurationFactory().CreateMapperConfiguration();
+
+        builder.Services
+            .AddDbContext<MoneyKeeperContext>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnectionString")))
+            .AddSingleton(mapperConfiguration)
+            .AddSingleton<IMapper, Mapper>()
+            .AddScoped<IDateTimeProvider, DateTimeProvider>()
+            .AddScoped<ICurrencyRepository, CurrencyRepository>()
+            .AddScoped<ICurrencyService, CurrencyService>()
+            .AddScoped<IExpenseRepository, ExpenseRepository>()
+            .AddScoped<IExpenseService, ExpenseService>();
 
         return builder;
     }

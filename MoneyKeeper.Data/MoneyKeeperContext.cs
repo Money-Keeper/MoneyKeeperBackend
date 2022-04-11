@@ -13,14 +13,22 @@ public sealed class MoneyKeeperContext : DbContext
     }
 
     public DbSet<Expense> Expenses { get; set; }
+    public DbSet<Currency> Currencies { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        var entity = modelBuilder.Entity<Expense>();
+        IEnumerable<IReadOnlyEntityType> entities = modelBuilder.Model.GetEntityTypes();
 
-        entity.Property(e => e.CreatedAt)
-            .HasDefaultValueSql("now()")
-            .Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
+        foreach (IReadOnlyEntityType entityType in entities)
+        {
+            if (entityType.ClrType is not null && entityType.ClrType.IsAssignableTo(typeof(BaseModel)))
+            {
+                modelBuilder.Entity(entityType.ClrType)
+                    .Property("CreatedAt")
+                    .HasDefaultValueSql("now()")
+                    .Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
+            }
+        }
 
         base.OnModelCreating(modelBuilder);
     }

@@ -8,6 +8,7 @@ public class ExpenseDto
     public decimal Amount { get; set; }
     public DateTime Date { get; set; }
     public string? Note { get; set; }
+    public CurrencyDto Currency { get; set; } = null!;
 }
 
 public class NewExpenseDto
@@ -17,6 +18,9 @@ public class NewExpenseDto
 
     [Required]
     public DateTime? Date { get; set; }
+
+    [Required]
+    public Guid? CurrencyId { get; set; }
 
     public string? Note { get; set; }
 }

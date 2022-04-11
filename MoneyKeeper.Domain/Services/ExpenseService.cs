@@ -1,11 +1,11 @@
-﻿using MoneyKeeper.Domain.Data.Models;
+﻿using MoneyKeeper.Domain.AutoMapper;
+using MoneyKeeper.Domain.Data.Models;
 using MoneyKeeper.Domain.Data.Repositories;
 using MoneyKeeper.Domain.Dtos;
-using MoneyKeeper.Domain.Mappers;
 
 namespace MoneyKeeper.Domain.Services;
 
-public class ExpenseService : IExpenseService
+public sealed class ExpenseService : IExpenseService
 {
     private readonly IMapper _mapper;
     private readonly IExpenseRepository _expenseRepository;
@@ -19,7 +19,7 @@ public class ExpenseService : IExpenseService
     public async Task<ExpenseDto?> GetAsync(Guid id)
     {
         Expense? result = await _expenseRepository.GetAsync(id);
-
+        
         return _mapper.Map<Expense, ExpenseDto>(result);
     }
 

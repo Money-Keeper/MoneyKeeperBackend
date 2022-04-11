@@ -5,14 +5,12 @@ using MoneyKeeper.Domain.Providers;
 
 namespace MoneyKeeper.Data.Repositories;
 
-public class ExpenseRepository : IExpenseRepository
+public sealed class ExpenseRepository : IExpenseRepository
 {
     private readonly MoneyKeeperContext _dbContext;
     private readonly IDateTimeProvider _dateTimeProvider;
 
-    public ExpenseRepository(
-        MoneyKeeperContext dbContext,
-        IDateTimeProvider dateTimeProvider)
+    public ExpenseRepository(MoneyKeeperContext dbContext, IDateTimeProvider dateTimeProvider)
     {
         _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
         _dateTimeProvider = dateTimeProvider ?? throw new ArgumentNullException(nameof(dateTimeProvider));
@@ -21,21 +19,31 @@ public class ExpenseRepository : IExpenseRepository
     public Task<Expense?> GetAsync(Guid id)
     {
         return _dbContext.Expenses
-            .AsNoTracking()
             .Where(x => x.DeletedAt == null)
+            .Include(x => x.Currency)
+            .AsNoTracking()
             .FirstOrDefaultAsync(x => x.Id == id);
     }
 
     public async Task<IEnumerable<Expense>> GetAsync()
     {
         return await _dbContext.Expenses
-            .AsNoTracking()
             .Where(x => x.DeletedAt == null)
+            .Include(x => x.Currency)
+            .AsNoTracking()
             .ToListAsync();
     }
 
     public async Task<bool> CreateAsync(Expense expense)
     {
+        Currency? existingCurrency = await _dbContext.Currencies
+            .Where(x => x.DeletedAt == null)
+            .AsNoTracking()
+            .FirstOrDefaultAsync(x => x.Id == expense.CurrencyId);
+
+        if (existingCurrency is null)
+            return false;
+
         expense.Date = expense.Date.ToUniversalTime();
 
         _dbContext.Expenses.Add(expense);
@@ -47,6 +55,14 @@ public class ExpenseRepository : IExpenseRepository
 
     public async Task<bool> UpdateAsync(Guid id, Expense expense)
     {
+        Currency? existingCurrency = await _dbContext.Currencies
+            .Where(x => x.DeletedAt == null)
+            .AsNoTracking()
+            .FirstOrDefaultAsync(x => x.Id == expense.CurrencyId);
+
+        if (existingCurrency is null)
+            return false;
+
         expense.Id = id;
         expense.Date = expense.Date.ToUniversalTime();
         expense.ModifiedAt = _dateTimeProvider.NowUtc;
@@ -60,10 +76,9 @@ public class ExpenseRepository : IExpenseRepository
 
     public async Task DeleteAsync(Guid id)
     {
-        Expense expense = new Expense { Id = id, DeletedAt = _dateTimeProvider.NowUtc };
+        Expense expense = _dbContext.Expenses.Attach(new Expense { Id = id }).Entity;
 
-        _dbContext.Attach(expense);
-        _dbContext.Entry(expense).Property(x => x.DeletedAt).IsModified = true;
+        expense.DeletedAt = _dateTimeProvider.NowUtc;
 
         await _dbContext.SaveChangesAsync();
     }
