@@ -1,4 +1,4 @@
-﻿namespace MoneyKeeper.Domain.AutoMapper;
+﻿namespace MoneyKeeper.Domain.Tools;
 
 public interface IMapper
 {

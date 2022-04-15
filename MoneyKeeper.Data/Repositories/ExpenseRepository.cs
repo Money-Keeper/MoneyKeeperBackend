@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using MoneyKeeper.Domain.Data.Abstractions.Repositories;
 using MoneyKeeper.Domain.Data.Models;
-using MoneyKeeper.Domain.Data.Repositories;
 using MoneyKeeper.Domain.Providers;
 
 namespace MoneyKeeper.Data.Repositories;
@@ -19,29 +19,30 @@ public sealed class ExpenseRepository : IExpenseRepository
     public Task<Expense?> GetAsync(Guid id)
     {
         return _dbContext.Expenses
-            .Where(x => x.DeletedAt == null)
-            .Include(x => x.Currency)
             .AsNoTracking()
+            .Include(x => x.Currency)
+            .Include(x => x.Category)
+            .ThenInclude(x => x.ParentCategory)
+            .Where(x => x.DeletedAt == null)
             .FirstOrDefaultAsync(x => x.Id == id);
     }
 
     public async Task<IEnumerable<Expense>> GetAsync()
     {
         return await _dbContext.Expenses
-            .Where(x => x.DeletedAt == null)
-            .Include(x => x.Currency)
             .AsNoTracking()
+            .Include(x => x.Currency)
+            .Include(x => x.Category)
+            .ThenInclude(x => x.ParentCategory)
+            .Where(x => x.DeletedAt == null)
             .ToListAsync();
     }
 
     public async Task<bool> CreateAsync(Expense expense)
     {
-        Currency? existingCurrency = await _dbContext.Currencies
-            .Where(x => x.DeletedAt == null)
-            .AsNoTracking()
-            .FirstOrDefaultAsync(x => x.Id == expense.CurrencyId);
+        bool isNestedEntitiesExists = await IsNestedEntitiesExistsAsync(expense);
 
-        if (existingCurrency is null)
+        if (!isNestedEntitiesExists)
             return false;
 
         expense.Date = expense.Date.ToUniversalTime();
@@ -55,12 +56,9 @@ public sealed class ExpenseRepository : IExpenseRepository
 
     public async Task<bool> UpdateAsync(Guid id, Expense expense)
     {
-        Currency? existingCurrency = await _dbContext.Currencies
-            .Where(x => x.DeletedAt == null)
-            .AsNoTracking()
-            .FirstOrDefaultAsync(x => x.Id == expense.CurrencyId);
+        bool isNestedEntitiesExists = await IsNestedEntitiesExistsAsync(expense);
 
-        if (existingCurrency is null)
+        if (!isNestedEntitiesExists)
             return false;
 
         expense.Id = id;
@@ -81,5 +79,14 @@ public sealed class ExpenseRepository : IExpenseRepository
         expense.DeletedAt = _dateTimeProvider.NowUtc;
 
         await _dbContext.SaveChangesAsync();
+    }
+
+    private async Task<bool> IsNestedEntitiesExistsAsync(Expense expense)
+    {
+        bool isCurrencyExists = await _dbContext.IsEntityExistsAsync<Currency>(expense.CurrencyId);
+        bool isCategoryExists = await _dbContext.IsEntityExistsAsync<Category>(expense.CategoryId);
+
+        return isCurrencyExists
+            && isCategoryExists;
     }
 }

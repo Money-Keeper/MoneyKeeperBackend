@@ -6,7 +6,7 @@ public interface IMapperConfiguration
         where TSource : class, new()
         where TTarget : class, new();
 
-    Func<TSource, TTarget> GetMapper<TSource, TTarget>()
+    Func<TSource?, TTarget?> GetMapper<TSource, TTarget>()
         where TSource : class, new()
         where TTarget : class, new();
 }

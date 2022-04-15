@@ -1,6 +1,8 @@
-﻿namespace MoneyKeeper.Domain.AutoMapper;
+﻿using MoneyKeeper.Domain.Tools;
 
-public class Mapper : IMapper
+namespace MoneyKeeper.Domain.AutoMapper;
+
+public sealed class Mapper : IMapper
 {
     private readonly IMapperConfiguration _mapperConfig;
 
@@ -13,10 +15,7 @@ public class Mapper : IMapper
         where TSource : class, new()
         where TTarget : class, new()
     {
-        if (source is null)
-            return null;
-
-        Func<TSource, TTarget> mapper = _mapperConfig.GetMapper<TSource, TTarget>();
+        Func<TSource?, TTarget?> mapper = _mapperConfig.GetMapper<TSource, TTarget>();
 
         return mapper(source);
     }
@@ -28,15 +27,12 @@ public class Mapper : IMapper
         if (source is null)
             throw new ArgumentNullException(nameof(source));
 
-        Func<TSource, TTarget> mapper = _mapperConfig.GetMapper<TSource, TTarget>();
+        if (!source.Any())
+            return Enumerable.Empty<TTarget>();
 
-        IList<TTarget> result = new List<TTarget>(source.Count());
+        Func<TSource?, TTarget?> mapper = _mapperConfig.GetMapper<TSource, TTarget>();
 
-        foreach (TSource value in source)
-        {
-            TTarget targetObj = mapper(value);
-            result.Add(targetObj);
-        }
+        IEnumerable<TTarget> result = source.Where(x => x is not null).Select(x => mapper(x)!);
 
         return result;
     }

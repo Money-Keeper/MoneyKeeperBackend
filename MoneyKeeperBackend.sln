@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MoneyKeeper", "MoneyKeeper\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MoneyKeeper.Domain", "MoneyKeeper.Domain\MoneyKeeper.Domain.csproj", "{641274F9-F98B-42CD-8AA1-656BC2C808FE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MoneyKeeper.Data", "MoneyKeeper.Data\MoneyKeeper.Data.csproj", "{28D05521-4EB9-453B-BCFD-FC3FC4CA957B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MoneyKeeper.Data", "MoneyKeeper.Data\MoneyKeeper.Data.csproj", "{28D05521-4EB9-453B-BCFD-FC3FC4CA957B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

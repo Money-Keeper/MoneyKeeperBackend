@@ -1,4 +1,4 @@
-﻿namespace MoneyKeeper.Domain.Data.Models;
+﻿namespace MoneyKeeper.Domain.Dtos;
 
 public class DataResult<TDto> where TDto : class
 {

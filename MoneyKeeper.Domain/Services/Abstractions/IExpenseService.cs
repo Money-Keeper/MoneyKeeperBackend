@@ -1,10 +1,10 @@
-﻿using MoneyKeeper.Domain.Data.Models;
-using MoneyKeeper.Domain.Dtos;
+﻿using MoneyKeeper.Domain.Dtos;
 
-namespace MoneyKeeper.Domain.Services;
+namespace MoneyKeeper.Domain.Services.Abstractions;
 
 public interface IExpenseService
 {
+    Task<bool> IsExistsAsync(Guid id);
     Task<ExpenseDto?> GetAsync(Guid id);
     Task<DataResult<ExpenseDto>> GetAsync();
     Task<bool> CreateAsync(NewExpenseDto expenseDto);

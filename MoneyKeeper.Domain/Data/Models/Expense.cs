@@ -7,4 +7,6 @@ public sealed class Expense : BaseModel
     public string? Note { get; set; }
     public Guid CurrencyId { get; set; }
     public Currency Currency { get; set; } = null!;
+    public Guid CategoryId { get; set; }
+    public Category Category { get; set; } = null!;
 }

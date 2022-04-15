@@ -1,10 +1,10 @@
-﻿using MoneyKeeper.Domain.Data.Models;
-using MoneyKeeper.Domain.Dtos;
+﻿using MoneyKeeper.Domain.Dtos;
 
-namespace MoneyKeeper.Domain.Services;
+namespace MoneyKeeper.Domain.Services.Abstractions;
 
 public interface ICurrencyService
 {
+    Task<bool> IsExistsAsync(Guid id);
     Task<CurrencyDto?> GetAsync(Guid id);
     Task<DataResult<CurrencyDto>> GetAsync();
     Task<bool> CreateAsync(NewCurrencyDto currencyDto);

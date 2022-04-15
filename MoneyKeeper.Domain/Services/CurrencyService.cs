@@ -1,19 +1,28 @@
-﻿using MoneyKeeper.Domain.AutoMapper;
+﻿using MoneyKeeper.Domain.Data.Abstractions;
+using MoneyKeeper.Domain.Data.Abstractions.Repositories;
 using MoneyKeeper.Domain.Data.Models;
-using MoneyKeeper.Domain.Data.Repositories;
 using MoneyKeeper.Domain.Dtos;
+using MoneyKeeper.Domain.Services.Abstractions;
+using MoneyKeeper.Domain.Tools;
 
 namespace MoneyKeeper.Domain.Services;
 
 public sealed class CurrencyService : ICurrencyService
 {
     private readonly IMapper _mapper;
+    private readonly IEntityHelper _entityHelper;
     private readonly ICurrencyRepository _currencyRepository;
 
-    public CurrencyService(IMapper mapper, ICurrencyRepository currencyRepository)
+    public CurrencyService(IMapper mapper, IEntityHelper entityHelper, ICurrencyRepository currencyRepository)
     {
         _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+        _entityHelper = entityHelper ?? throw new ArgumentNullException(nameof(entityHelper));
         _currencyRepository = currencyRepository ?? throw new ArgumentNullException(nameof(currencyRepository));
+    }
+
+    public Task<bool> IsExistsAsync(Guid id)
+    {
+        return _entityHelper.IsExistsAsync<Currency>(id);
     }
 
     public async Task<CurrencyDto?> GetAsync(Guid id)

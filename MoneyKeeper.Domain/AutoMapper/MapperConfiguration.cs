@@ -25,16 +25,16 @@ public sealed class MapperConfiguration : IMapperConfiguration
         }
     }
 
-    public Func<TSource, TTarget> GetMapper<TSource, TTarget>()
+    public Func<TSource?, TTarget?> GetMapper<TSource, TTarget>()
         where TSource : class, new()
         where TTarget : class, new()
     {
-        Func<object, object> mapper = GetMapperFunc(typeof(TSource), typeof(TTarget));
+        Func<object?, object?> mapper = GetMapperFunc(typeof(TSource), typeof(TTarget));
         // TODO: Maybe should be improved sometime.
-        return source => (TTarget)mapper(source);
+        return source => (TTarget?)mapper(source);
     }
 
-    private Func<object, object> GetMapperFunc(Type sourceType, Type targetType)
+    private Func<object?, object?> GetMapperFunc(Type sourceType, Type targetType)
     {
         string mapName = GetMapName(sourceType, targetType);
 
@@ -45,15 +45,18 @@ public sealed class MapperConfiguration : IMapperConfiguration
 
         return source =>
         {
+            if (source is null)
+                return null;
+
             object targetObj = Activator.CreateInstance(targetType)!;
 
             foreach (PropertyMap propertyMap in objectMap.PropertyMaps)
             {
-                object sourceValue = propertyMap.SourceProperty.GetValue(source)!;
+                object? sourceValue = propertyMap.SourceProperty.GetValue(source);
 
                 if (propertyMap.IsNestedEntity)
                 {
-                    Func<object, object> mapper = GetMapperFunc(
+                    Func<object?, object?> mapper = GetMapperFunc(
                         sourceType: propertyMap.SourceProperty.PropertyType,
                         targetType: propertyMap.TargetProperty.PropertyType);
 

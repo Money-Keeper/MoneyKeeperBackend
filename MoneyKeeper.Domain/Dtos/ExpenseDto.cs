@@ -9,6 +9,7 @@ public class ExpenseDto
     public DateTime Date { get; set; }
     public string? Note { get; set; }
     public CurrencyDto Currency { get; set; } = null!;
+    public CategoryDto Category { get; set; } = null!;
 }
 
 public class NewExpenseDto
@@ -21,6 +22,9 @@ public class NewExpenseDto
 
     [Required]
     public Guid? CurrencyId { get; set; }
+
+    [Required]
+    public Guid? CategoryId { get; set; }
 
     public string? Note { get; set; }
 }

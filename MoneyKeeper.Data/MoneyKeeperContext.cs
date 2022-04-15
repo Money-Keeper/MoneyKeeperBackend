@@ -14,6 +14,13 @@ public sealed class MoneyKeeperContext : DbContext
 
     public DbSet<Expense> Expenses { get; set; }
     public DbSet<Currency> Currencies { get; set; }
+    public DbSet<Category> Categories { get; set; }
+
+    public Task<bool> IsEntityExistsAsync<TEntity>(Guid id)
+        where TEntity : BaseModel
+    {
+        return Set<TEntity>().AnyAsync(x => x.Id == id && x.DeletedAt == null);
+    }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

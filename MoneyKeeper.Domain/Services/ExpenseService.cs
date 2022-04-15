@@ -1,19 +1,28 @@
-﻿using MoneyKeeper.Domain.AutoMapper;
+﻿using MoneyKeeper.Domain.Data.Abstractions;
+using MoneyKeeper.Domain.Data.Abstractions.Repositories;
 using MoneyKeeper.Domain.Data.Models;
-using MoneyKeeper.Domain.Data.Repositories;
 using MoneyKeeper.Domain.Dtos;
+using MoneyKeeper.Domain.Services.Abstractions;
+using MoneyKeeper.Domain.Tools;
 
 namespace MoneyKeeper.Domain.Services;
 
 public sealed class ExpenseService : IExpenseService
 {
     private readonly IMapper _mapper;
+    private readonly IEntityHelper _entityHelper;
     private readonly IExpenseRepository _expenseRepository;
 
-    public ExpenseService(IMapper mapper, IExpenseRepository expenseRepository)
+    public ExpenseService(IMapper mapper, IEntityHelper entityHelper, IExpenseRepository expenseRepository)
     {
         _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+        _entityHelper = entityHelper ?? throw new ArgumentNullException(nameof(entityHelper));
         _expenseRepository = expenseRepository ?? throw new ArgumentNullException(nameof(expenseRepository));
+    }
+
+    public Task<bool> IsExistsAsync(Guid id)
+    {
+        return _entityHelper.IsExistsAsync<Expense>(id);
     }
 
     public async Task<ExpenseDto?> GetAsync(Guid id)

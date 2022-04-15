@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using MoneyKeeper.Domain.Data.Abstractions.Repositories;
 using MoneyKeeper.Domain.Data.Models;
-using MoneyKeeper.Domain.Data.Repositories;
 using MoneyKeeper.Domain.Providers;
 
 namespace MoneyKeeper.Data.Repositories;
