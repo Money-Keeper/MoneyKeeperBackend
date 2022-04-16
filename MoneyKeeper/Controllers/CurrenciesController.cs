@@ -31,7 +31,7 @@ public sealed class CurrenciesController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult> Post(NewCurrencyDto newCurrencyDto)
+    public async Task<IActionResult> Post(NewCurrencyDto newCurrencyDto)
     {
         bool result = await _currencyService.CreateAsync(newCurrencyDto);
 
@@ -39,7 +39,7 @@ public sealed class CurrenciesController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    public async Task<ActionResult> Put(Guid id, NewCurrencyDto newCurrencyDto)
+    public async Task<IActionResult> Put(Guid id, NewCurrencyDto newCurrencyDto)
     {
         bool isExists = await _currencyService.IsExistsAsync(id);
 
@@ -52,7 +52,7 @@ public sealed class CurrenciesController : ControllerBase
     }
 
     [HttpDelete("{id}")]
-    public async Task<ActionResult> Delete(Guid id)
+    public async Task<IActionResult> Delete(Guid id)
     {
         bool isExists = await _currencyService.IsExistsAsync(id);
 

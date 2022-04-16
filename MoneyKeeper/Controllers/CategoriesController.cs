@@ -31,7 +31,7 @@ public sealed class CategoriesController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult> Post(NewCategoryDto newCategoryDto)
+    public async Task<IActionResult> Post(NewCategoryDto newCategoryDto)
     {
         bool result = await _categoryService.CreateAsync(newCategoryDto);
 
@@ -39,7 +39,7 @@ public sealed class CategoriesController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    public async Task<ActionResult> Put(Guid id, NewCategoryDto newCategoryDto)
+    public async Task<IActionResult> Put(Guid id, NewCategoryDto newCategoryDto)
     {
         bool isExists = await _categoryService.IsExistsAsync(id);
 
@@ -52,7 +52,7 @@ public sealed class CategoriesController : ControllerBase
     }
 
     [HttpDelete("{id}")]
-    public async Task<ActionResult> Delete(Guid id)
+    public async Task<IActionResult> Delete(Guid id)
     {
         bool isExists = await _categoryService.IsExistsAsync(id);
 

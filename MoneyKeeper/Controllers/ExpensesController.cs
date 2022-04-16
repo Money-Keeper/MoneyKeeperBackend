@@ -31,7 +31,7 @@ public sealed class ExpensesController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult> Post(NewExpenseDto newExpenseDto)
+    public async Task<IActionResult> Post(NewExpenseDto newExpenseDto)
     {
         bool result = await _expenseService.CreateAsync(newExpenseDto);
 
@@ -39,7 +39,7 @@ public sealed class ExpensesController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    public async Task<ActionResult> Put(Guid id, NewExpenseDto newExpenseDto)
+    public async Task<IActionResult> Put(Guid id, NewExpenseDto newExpenseDto)
     {
         bool isExists = await _expenseService.IsExistsAsync(id);
 
@@ -52,7 +52,7 @@ public sealed class ExpensesController : ControllerBase
     }
 
     [HttpDelete("{id}")]
-    public async Task<ActionResult> Delete(Guid id)
+    public async Task<IActionResult> Delete(Guid id)
     {
         bool isExists = await _expenseService.IsExistsAsync(id);
 
