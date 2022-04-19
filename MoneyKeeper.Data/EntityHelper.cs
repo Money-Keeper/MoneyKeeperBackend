@@ -12,8 +12,8 @@ public sealed class EntityHelper : IEntityHelper
         _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
     }
 
-    public Task<bool> IsExistsAsync<TEntity>(Guid id) where TEntity : BaseModel
+    public Task<bool> ExistsAsync<TEntity>(Guid id) where TEntity : BaseModel
     {
-        return _dbContext.IsEntityExistsAsync<TEntity>(id);
+        return _dbContext.EntityExistsAsync<TEntity>(id);
     }
 }

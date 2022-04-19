@@ -1,12 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MoneyKeeper.Domain.Dtos;
 using MoneyKeeper.Domain.Services.Abstractions;
+using System.Net.Mime;
 
 namespace MoneyKeeper.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-[Produces("application/json")]
+[Produces(MediaTypeNames.Application.Json)]
 public sealed class CategoriesController : ControllerBase
 {
     private readonly ICategoryService _categoryService;
@@ -41,7 +42,7 @@ public sealed class CategoriesController : ControllerBase
     [HttpPut("{id}")]
     public async Task<IActionResult> Put(Guid id, NewCategoryDto newCategoryDto)
     {
-        bool isExists = await _categoryService.IsExistsAsync(id);
+        bool isExists = await _categoryService.ExistsAsync(id);
 
         if (!isExists)
             return NotFound();
@@ -54,7 +55,7 @@ public sealed class CategoriesController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(Guid id)
     {
-        bool isExists = await _categoryService.IsExistsAsync(id);
+        bool isExists = await _categoryService.ExistsAsync(id);
 
         if (!isExists)
             return NotFound();

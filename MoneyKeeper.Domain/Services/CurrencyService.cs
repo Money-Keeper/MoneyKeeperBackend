@@ -3,7 +3,7 @@ using MoneyKeeper.Domain.Data.Abstractions.Repositories;
 using MoneyKeeper.Domain.Data.Models;
 using MoneyKeeper.Domain.Dtos;
 using MoneyKeeper.Domain.Services.Abstractions;
-using MoneyKeeper.Domain.Tools;
+using MoneyKeeper.Domain.Tools.Abstractions;
 
 namespace MoneyKeeper.Domain.Services;
 
@@ -20,9 +20,9 @@ public sealed class CurrencyService : ICurrencyService
         _currencyRepository = currencyRepository ?? throw new ArgumentNullException(nameof(currencyRepository));
     }
 
-    public Task<bool> IsExistsAsync(Guid id)
+    public Task<bool> ExistsAsync(Guid id)
     {
-        return _entityHelper.IsExistsAsync<Currency>(id);
+        return _entityHelper.ExistsAsync<Currency>(id);
     }
 
     public async Task<CurrencyDto?> GetAsync(Guid id)

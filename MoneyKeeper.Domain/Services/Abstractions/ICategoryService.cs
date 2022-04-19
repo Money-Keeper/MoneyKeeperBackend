@@ -4,7 +4,7 @@ namespace MoneyKeeper.Domain.Services.Abstractions;
 
 public interface ICategoryService
 {
-    Task<bool> IsExistsAsync(Guid id);
+    Task<bool> ExistsAsync(Guid id);
     Task<CategoryDto?> GetAsync(Guid id);
     Task<DataResult<CategoryDto>> GetAsync();
     Task<bool> CreateAsync(NewCategoryDto categoryDto);

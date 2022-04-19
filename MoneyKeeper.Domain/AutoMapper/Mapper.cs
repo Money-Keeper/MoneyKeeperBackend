@@ -1,4 +1,4 @@
-﻿using MoneyKeeper.Domain.Tools;
+﻿using MoneyKeeper.Domain.Tools.Abstractions;
 
 namespace MoneyKeeper.Domain.AutoMapper;
 

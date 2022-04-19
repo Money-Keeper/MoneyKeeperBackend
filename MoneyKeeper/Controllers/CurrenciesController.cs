@@ -1,12 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MoneyKeeper.Domain.Dtos;
 using MoneyKeeper.Domain.Services.Abstractions;
+using System.Net.Mime;
 
 namespace MoneyKeeper.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-[Produces("application/json")]
+[Produces(MediaTypeNames.Application.Json)]
 public sealed class CurrenciesController : ControllerBase
 {
     private readonly ICurrencyService _currencyService;
@@ -33,6 +34,8 @@ public sealed class CurrenciesController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Post(NewCurrencyDto newCurrencyDto)
     {
+        Console.WriteLine(Request.Form.Count);
+
         bool result = await _currencyService.CreateAsync(newCurrencyDto);
 
         return result ? Ok() : BadRequest();
@@ -41,7 +44,7 @@ public sealed class CurrenciesController : ControllerBase
     [HttpPut("{id}")]
     public async Task<IActionResult> Put(Guid id, NewCurrencyDto newCurrencyDto)
     {
-        bool isExists = await _currencyService.IsExistsAsync(id);
+        bool isExists = await _currencyService.ExistsAsync(id);
 
         if (!isExists)
             return NotFound();
@@ -54,7 +57,7 @@ public sealed class CurrenciesController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(Guid id)
     {
-        bool isExists = await _currencyService.IsExistsAsync(id);
+        bool isExists = await _currencyService.ExistsAsync(id);
 
         if (!isExists)
             return NotFound();

@@ -11,8 +11,7 @@ public class CategoryDto
 
 public class NewCategoryDto
 {
-    [Required]
-    [StringLength(maximumLength: 32)]
+    [Required, StringLength(maximumLength: 32)]
     public string? Name { get; set; }
     public Guid? ParentCategoryId { get; set; }
 }

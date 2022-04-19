@@ -4,7 +4,7 @@ namespace MoneyKeeper.Domain.Services.Abstractions;
 
 public interface IExpenseService
 {
-    Task<bool> IsExistsAsync(Guid id);
+    Task<bool> ExistsAsync(Guid id);
     Task<ExpenseDto?> GetAsync(Guid id);
     Task<DataResult<ExpenseDto>> GetAsync();
     Task<bool> CreateAsync(NewExpenseDto expenseDto);

@@ -1,4 +1,4 @@
-﻿namespace MoneyKeeper.Domain.Providers;
+﻿namespace MoneyKeeper.Domain.Providers.Abstractions;
 
 public interface IDateTimeProvider
 {

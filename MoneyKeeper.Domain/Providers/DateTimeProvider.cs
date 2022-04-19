@@ -1,4 +1,6 @@
-﻿namespace MoneyKeeper.Domain.Providers;
+﻿using MoneyKeeper.Domain.Providers.Abstractions;
+
+namespace MoneyKeeper.Domain.Providers;
 
 public sealed class DateTimeProvider : IDateTimeProvider
 {

@@ -1,12 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MoneyKeeper.Domain.Dtos;
 using MoneyKeeper.Domain.Services.Abstractions;
+using System.Net.Mime;
 
 namespace MoneyKeeper.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-[Produces("application/json")]
+[Produces(MediaTypeNames.Application.Json)]
 public sealed class ExpensesController : ControllerBase
 {
     private readonly IExpenseService _expenseService;
@@ -41,7 +42,7 @@ public sealed class ExpensesController : ControllerBase
     [HttpPut("{id}")]
     public async Task<IActionResult> Put(Guid id, NewExpenseDto newExpenseDto)
     {
-        bool isExists = await _expenseService.IsExistsAsync(id);
+        bool isExists = await _expenseService.ExistsAsync(id);
 
         if (!isExists)
             return NotFound();
@@ -54,7 +55,7 @@ public sealed class ExpensesController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(Guid id)
     {
-        bool isExists = await _expenseService.IsExistsAsync(id);
+        bool isExists = await _expenseService.ExistsAsync(id);
 
         if (!isExists)
             return NotFound();

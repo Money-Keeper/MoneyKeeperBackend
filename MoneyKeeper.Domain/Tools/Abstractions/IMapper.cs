@@ -1,4 +1,4 @@
-﻿namespace MoneyKeeper.Domain.Tools;
+﻿namespace MoneyKeeper.Domain.Tools.Abstractions;
 
 public interface IMapper
 {

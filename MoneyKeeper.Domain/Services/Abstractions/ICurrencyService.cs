@@ -4,7 +4,7 @@ namespace MoneyKeeper.Domain.Services.Abstractions;
 
 public interface ICurrencyService
 {
-    Task<bool> IsExistsAsync(Guid id);
+    Task<bool> ExistsAsync(Guid id);
     Task<CurrencyDto?> GetAsync(Guid id);
     Task<DataResult<CurrencyDto>> GetAsync();
     Task<bool> CreateAsync(NewCurrencyDto currencyDto);

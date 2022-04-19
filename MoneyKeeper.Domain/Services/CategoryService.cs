@@ -3,7 +3,7 @@ using MoneyKeeper.Domain.Data.Abstractions.Repositories;
 using MoneyKeeper.Domain.Data.Models;
 using MoneyKeeper.Domain.Dtos;
 using MoneyKeeper.Domain.Services.Abstractions;
-using MoneyKeeper.Domain.Tools;
+using MoneyKeeper.Domain.Tools.Abstractions;
 
 namespace MoneyKeeper.Domain.Services;
 
@@ -20,9 +20,9 @@ public sealed class CategoryService : ICategoryService
         _categoryRepository = categoryRepository ?? throw new ArgumentNullException(nameof(categoryRepository));
     }
 
-    public Task<bool> IsExistsAsync(Guid id)
+    public Task<bool> ExistsAsync(Guid id)
     {
-        return _entityHelper.IsExistsAsync<Category>(id);
+        return _entityHelper.ExistsAsync<Category>(id);
     }
 
     public async Task<CategoryDto?> GetAsync(Guid id)

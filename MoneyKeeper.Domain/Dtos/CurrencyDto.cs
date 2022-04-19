@@ -12,12 +12,10 @@ public class CurrencyDto
 
 public class NewCurrencyDto
 {
-    [Required]
-    [StringLength(maximumLength: 32)]
+    [Required, StringLength(maximumLength: 32)]
     public string? Name { get; set; }
 
-    [Required]
-    [StringLength(maximumLength: 3, MinimumLength = 3)]
+    [Required, StringLength(maximumLength: 3, MinimumLength = 3)]
     public string? Code { get; set; }
 
     [Required]

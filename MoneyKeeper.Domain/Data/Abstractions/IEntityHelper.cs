@@ -4,5 +4,5 @@ namespace MoneyKeeper.Domain.Data.Abstractions;
 
 public interface IEntityHelper
 {
-    Task<bool> IsExistsAsync<TEntity>(Guid id) where TEntity : BaseModel;
+    Task<bool> ExistsAsync<TEntity>(Guid id) where TEntity : BaseModel;
 }

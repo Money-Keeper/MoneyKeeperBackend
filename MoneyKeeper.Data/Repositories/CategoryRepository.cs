@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MoneyKeeper.Domain.Data.Abstractions.Repositories;
 using MoneyKeeper.Domain.Data.Models;
-using MoneyKeeper.Domain.Providers;
+using MoneyKeeper.Domain.Providers.Abstractions;
 
 namespace MoneyKeeper.Data.Repositories;
 
@@ -38,7 +38,7 @@ public sealed class CategoryRepository : ICategoryRepository
     {
         if (category.ParentCategoryId.HasValue)
         {
-            bool isCategoryExists = await _dbContext.IsEntityExistsAsync<Category>(category.ParentCategoryId.Value);
+            bool isCategoryExists = await _dbContext.EntityExistsAsync<Category>(category.ParentCategoryId.Value);
 
             if (!isCategoryExists)
                 return false;
@@ -55,7 +55,7 @@ public sealed class CategoryRepository : ICategoryRepository
     {
         if (category.ParentCategoryId.HasValue)
         {
-            bool isCategoryExists = await _dbContext.IsEntityExistsAsync<Category>(category.ParentCategoryId.Value);
+            bool isCategoryExists = await _dbContext.EntityExistsAsync<Category>(category.ParentCategoryId.Value);
 
             if (!isCategoryExists)
                 return false;
