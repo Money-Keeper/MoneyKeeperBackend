@@ -10,6 +10,7 @@ public class ExpenseDto
     public string? Note { get; set; }
     public CurrencyDto Currency { get; set; } = null!;
     public CategoryDto Category { get; set; } = null!;
+    public InvoiceDto? Invoice { get; set; }
 }
 
 public class NewExpenseDto
@@ -27,4 +28,6 @@ public class NewExpenseDto
     public Guid? CategoryId { get; set; }
 
     public string? Note { get; set; }
+
+    public InvoiceDto? Invoice { get; set; }
 }

@@ -9,4 +9,5 @@ public sealed class Expense : BaseModel
     public Currency Currency { get; set; } = null!;
     public Guid CategoryId { get; set; }
     public Category Category { get; set; } = null!;
+    public Invoice? Invoice { get; set; }
 }

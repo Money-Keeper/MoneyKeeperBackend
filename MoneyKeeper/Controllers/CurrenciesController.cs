@@ -34,8 +34,6 @@ public sealed class CurrenciesController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Post(NewCurrencyDto newCurrencyDto)
     {
-        Console.WriteLine(Request.Form.Count);
-
         bool result = await _currencyService.CreateAsync(newCurrencyDto);
 
         return result ? Ok() : BadRequest();
@@ -44,9 +42,9 @@ public sealed class CurrenciesController : ControllerBase
     [HttpPut("{id}")]
     public async Task<IActionResult> Put(Guid id, NewCurrencyDto newCurrencyDto)
     {
-        bool isExists = await _currencyService.ExistsAsync(id);
+        bool exists = await _currencyService.ExistsAsync(id);
 
-        if (!isExists)
+        if (!exists)
             return NotFound();
 
         bool result = await _currencyService.UpdateAsync(id, newCurrencyDto);
@@ -57,9 +55,9 @@ public sealed class CurrenciesController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(Guid id)
     {
-        bool isExists = await _currencyService.ExistsAsync(id);
+        bool exists = await _currencyService.ExistsAsync(id);
 
-        if (!isExists)
+        if (!exists)
             return NotFound();
 
         await _currencyService.DeleteAsync(id);

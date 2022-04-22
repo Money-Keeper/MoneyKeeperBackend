@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MoneyKeeper.Data.Migrations
 {
     [DbContext(typeof(MoneyKeeperContext))]
-    [Migration("20220415223301_Initial")]
+    [Migration("20220422170032_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -132,6 +132,44 @@ namespace MoneyKeeper.Data.Migrations
                     b.ToTable("Expenses");
                 });
 
+            modelBuilder.Entity("MoneyKeeper.Domain.Data.Models.Invoice", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("now()");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("ExpenseId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("ImagePath")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("ModifiedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("PdfPath")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Url")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ExpenseId")
+                        .IsUnique();
+
+                    b.ToTable("Invoice");
+                });
+
             modelBuilder.Entity("MoneyKeeper.Domain.Data.Models.Category", b =>
                 {
                     b.HasOne("MoneyKeeper.Domain.Data.Models.Category", "ParentCategory")
@@ -158,6 +196,20 @@ namespace MoneyKeeper.Data.Migrations
                     b.Navigation("Category");
 
                     b.Navigation("Currency");
+                });
+
+            modelBuilder.Entity("MoneyKeeper.Domain.Data.Models.Invoice", b =>
+                {
+                    b.HasOne("MoneyKeeper.Domain.Data.Models.Expense", null)
+                        .WithOne("Invoice")
+                        .HasForeignKey("MoneyKeeper.Domain.Data.Models.Invoice", "ExpenseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("MoneyKeeper.Domain.Data.Models.Expense", b =>
+                {
+                    b.Navigation("Invoice");
                 });
 #pragma warning restore 612, 618
         }

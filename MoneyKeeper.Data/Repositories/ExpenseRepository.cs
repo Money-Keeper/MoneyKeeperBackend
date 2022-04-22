@@ -23,6 +23,7 @@ public sealed class ExpenseRepository : IExpenseRepository
             .Include(x => x.Currency)
             .Include(x => x.Category)
             .ThenInclude(x => x.ParentCategory)
+            .Include(x => x.Invoice)
             .Where(x => x.DeletedAt == null)
             .FirstOrDefaultAsync(x => x.Id == id);
     }
@@ -34,6 +35,7 @@ public sealed class ExpenseRepository : IExpenseRepository
             .Include(x => x.Currency)
             .Include(x => x.Category)
             .ThenInclude(x => x.ParentCategory)
+            .Include(x => x.Invoice)
             .Where(x => x.DeletedAt == null)
             .ToListAsync();
     }
