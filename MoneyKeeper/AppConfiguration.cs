@@ -13,7 +13,7 @@ internal static class AppConfiguration
         if (args.Length > 0 && args[0] == DbMigrationCommand)
         {
             using IServiceScope scope = app.Services.CreateScope();
-            scope.ServiceProvider.GetService<MoneyKeeperContext>()!.Database.Migrate();
+            scope.ServiceProvider.GetService<AppDbContext>()!.Database.Migrate();
         }
 
         // Configure the HTTP request pipeline.

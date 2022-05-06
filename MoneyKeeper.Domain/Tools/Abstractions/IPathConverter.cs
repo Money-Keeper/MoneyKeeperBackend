@@ -2,6 +2,6 @@
 
 public interface IPathConverter
 {
-    string FromUrl(string url);
-    string ToUrl(string path);
+    string FromLink(string link);
+    string ToLink(string path);
 }

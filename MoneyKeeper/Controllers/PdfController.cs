@@ -1,56 +1,36 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using MoneyKeeper.Domain.Dtos;
-using MoneyKeeper.Domain.Providers.FilesProvider;
-using MoneyKeeper.Domain.Tools.Abstractions;
+using MoneyKeeper.Dtos;
+using MoneyKeeper.Facades.FileFacades;
 using System.Net.Mime;
 
 namespace MoneyKeeper.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/pdf")]
 [Produces(MediaTypeNames.Application.Json)]
 public sealed class PdfController : ControllerBase
 {
-    private readonly IFilesProvider _filesProvider;
-    private readonly IPathConverter _pathConverter;
+    private readonly IPdfService _pdfService;
 
-    public PdfController(IFilesProvider filesProvider, IPathConverter pathConverter)
+    public PdfController(IPdfService pdfService)
     {
-        _filesProvider = filesProvider ?? throw new ArgumentNullException(nameof(filesProvider));
-        _pathConverter = pathConverter ?? throw new ArgumentNullException(nameof(pathConverter));
+        _pdfService = pdfService ?? throw new ArgumentNullException(nameof(pdfService));
     }
 
-    [HttpGet("{**filePath}")]
-    public async Task<IActionResult> Get(string filePath)
+    [HttpGet("{**link}")]
+    public async Task<IActionResult> Get(string link)
     {
-        bool isPdf = filePath.EndsWith(FileExtensions.Pdf);
-
-        if (!isPdf)
+        if (!_pdfService.IsValidLink(link))
             return BadRequest();
 
-        filePath = _pathConverter.FromUrl(filePath);
-
-        bool fileExists = _filesProvider.Exists(filePath, FileType.Pdf);
+        bool fileExists = await _pdfService.ExistsAsync(link);
 
         if (!fileExists)
             return NotFound();
 
-        byte[] pdf = await _filesProvider.GetAsync(filePath, FileType.Pdf);
-
-        return File(pdf, MediaTypeNames.Application.Pdf);
+        return await _pdfService.GetAsync(link);
     }
 
     [HttpPost]
-    public async Task<ActionResult<FilePathDto>> Post(IFormFile file)
-    {
-        using Stream stream = file.OpenReadStream();
-
-        byte[] pdf = new byte[stream.Length];
-
-        await stream.ReadAsync(pdf);
-
-        string path = await _filesProvider.SaveAsync(pdf, FileType.Pdf);
-
-        return new FilePathDto(_pathConverter.ToUrl(path));
-    }
+    public async Task<ActionResult<FileLinkDto>> Post(IFormFile file) => await _pdfService.CreateAsync(file);
 }

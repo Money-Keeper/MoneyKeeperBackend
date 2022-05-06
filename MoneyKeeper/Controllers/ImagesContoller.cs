@@ -1,56 +1,36 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using MoneyKeeper.Domain.Dtos;
-using MoneyKeeper.Domain.Providers.FilesProvider;
-using MoneyKeeper.Domain.Tools.Abstractions;
+using MoneyKeeper.Dtos;
+using MoneyKeeper.Facades.FileFacades;
 using System.Net.Mime;
 
 namespace MoneyKeeper.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/img")]
 [Produces(MediaTypeNames.Application.Json)]
 public sealed class ImagesController : ControllerBase
 {
-    private readonly IFilesProvider _filesProvider;
-    private readonly IPathConverter _pathConverter;
+    private readonly IImageService _imageService;
 
-    public ImagesController(IFilesProvider filesProvider, IPathConverter pathConverter)
+    public ImagesController(IImageService imageService)
     {
-        _filesProvider = filesProvider ?? throw new ArgumentNullException(nameof(filesProvider));
-        _pathConverter = pathConverter ?? throw new ArgumentNullException(nameof(pathConverter));
+        _imageService = imageService ?? throw new ArgumentNullException(nameof(imageService));
     }
 
-    [HttpGet("{**filePath}")]
-    public async Task<IActionResult> Get(string filePath)
+    [HttpGet("{**link}")]
+    public async Task<IActionResult> Get(string link)
     {
-        bool isImage = filePath.EndsWith(FileExtensions.Jpg) || filePath.EndsWith(FileExtensions.Jpeg);
-
-        if (!isImage)
+        if (!_imageService.IsValidLink(link))
             return BadRequest();
 
-        filePath = _pathConverter.FromUrl(filePath);
+        bool fileExists = await _imageService.ExistsAsync(link);
 
-        bool fileExists = _filesProvider.Exists(filePath, FileType.Image);
-        
         if (!fileExists)
             return NotFound();
 
-        byte[] image = await _filesProvider.GetAsync(filePath, FileType.Image);
-
-        return File(image, MediaTypeNames.Image.Jpeg);
+        return await _imageService.GetAsync(link);
     }
 
     [HttpPost]
-    public async Task<ActionResult<FilePathDto>> Post(IFormFile file)
-    {
-        using Stream stream = file.OpenReadStream();
-
-        byte[] image = new byte[stream.Length];
-
-        await stream.ReadAsync(image);
-
-        string path = await _filesProvider.SaveAsync(image, FileType.Image);
-
-        return new FilePathDto(_pathConverter.ToUrl(path));
-    }
+    public async Task<ActionResult<FileLinkDto>> Post(IFormFile file) => await _imageService.CreateAsync(file);
 }

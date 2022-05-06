@@ -1,66 +1,78 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using MoneyKeeper.Domain.Dtos;
-using MoneyKeeper.Domain.Services.Abstractions;
+using MoneyKeeper.Dtos;
+using MoneyKeeper.Facades.ExpenseFacades;
 using System.Net.Mime;
 
 namespace MoneyKeeper.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/expenses")]
 [Produces(MediaTypeNames.Application.Json)]
 public sealed class ExpensesController : ControllerBase
 {
-    private readonly IExpenseService _expenseService;
+    private readonly IExpenseQueriesService _queriesService;
+    private readonly IExpenseCommandsService _commandsService;
 
-    public ExpensesController(IExpenseService expenseService)
+    public ExpensesController(IExpenseQueriesService queriesService, IExpenseCommandsService commandsService)
     {
-        _expenseService = expenseService ?? throw new ArgumentNullException(nameof(expenseService));
+        _queriesService = queriesService ?? throw new ArgumentNullException(nameof(queriesService));
+        _commandsService = commandsService ?? throw new ArgumentNullException(nameof(commandsService));
     }
 
     [HttpGet]
-    public async Task<DataResult<ExpenseDto>> Get() => await _expenseService.GetAsync();
+    public async Task<DataResult<ExpenseDto>> Get() => await _queriesService.GetAsync();
 
     [HttpGet("{id}")]
     public async Task<ActionResult<ExpenseDto>> Get(Guid id)
     {
-        ExpenseDto? expense = await _expenseService.GetAsync(id);
+        ExpenseDto? result = await _queriesService.GetAsync(id);
 
-        if (expense is null)
+        if (result is null)
             return NotFound();
 
-        return expense;
+        return result;
     }
 
     [HttpPost]
-    public async Task<IActionResult> Post(NewExpenseDto newExpenseDto)
+    public async Task<ActionResult<ExpenseDto>> Post(NewExpenseDto newExpenseDto)
     {
-        bool result = await _expenseService.CreateAsync(newExpenseDto);
+        Guid? resultId = await _commandsService.CreateAsync(newExpenseDto);
 
-        return result ? Ok() : BadRequest();
+        if (!resultId.HasValue)
+            return BadRequest();
+
+        ExpenseDto result = (await _queriesService.GetAsync(resultId.Value))!;
+
+        return result;
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Put(Guid id, NewExpenseDto newExpenseDto)
+    public async Task<ActionResult<ExpenseDto>> Put(Guid id, NewExpenseDto newExpenseDto)
     {
-        bool exists = await _expenseService.ExistsAsync(id);
+        bool exists = await _queriesService.ExistsAsync(id);
 
         if (!exists)
             return NotFound();
 
-        bool result = await _expenseService.UpdateAsync(id, newExpenseDto);
+        Guid? resultId = await _commandsService.UpdateAsync(id, newExpenseDto);
 
-        return result ? NoContent() : BadRequest();
+        if (!resultId.HasValue)
+            return BadRequest();
+
+        ExpenseDto result = (await _queriesService.GetAsync(resultId.Value))!;
+
+        return result!;
     }
 
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(Guid id)
     {
-        bool exists = await _expenseService.ExistsAsync(id);
+        bool exists = await _queriesService.ExistsAsync(id);
 
         if (!exists)
             return NotFound();
 
-        await _expenseService.DeleteAsync(id);
+        await _commandsService.DeleteAsync(id);
 
         return NoContent();
     }

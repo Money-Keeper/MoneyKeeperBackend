@@ -1,16 +1,19 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using MoneyKeeper.AutoMapper;
+using MoneyKeeper.AutoMapper.Abstractions;
 using MoneyKeeper.Data;
-using MoneyKeeper.Data.Repositories;
-using MoneyKeeper.Domain.AutoMapper;
-using MoneyKeeper.Domain.Data.Abstractions;
-using MoneyKeeper.Domain.Data.Abstractions.Repositories;
+using MoneyKeeper.Data.QueryServices;
+using MoneyKeeper.Domain.Infrastructure.Commands;
+using MoneyKeeper.Domain.Infrastructure.Events;
+using MoneyKeeper.Domain.Infrastructure.Queries;
+using MoneyKeeper.Domain.Models;
 using MoneyKeeper.Domain.Providers;
 using MoneyKeeper.Domain.Providers.Abstractions;
-using MoneyKeeper.Domain.Providers.FilesProvider;
-using MoneyKeeper.Domain.Services;
-using MoneyKeeper.Domain.Services.Abstractions;
+using MoneyKeeper.Domain.Queries;
 using MoneyKeeper.Domain.Tools;
 using MoneyKeeper.Domain.Tools.Abstractions;
+using MoneyKeeper.Factories;
+using System.Reflection;
 
 namespace MoneyKeeper;
 
@@ -19,59 +22,94 @@ internal static class AppBuilderConfiguration
     public static WebApplicationBuilder ConfigureBuilder(this WebApplicationBuilder builder)
     {
         builder.Services.AddControllers();
+
         builder.Services
-            .AddDbContext<MoneyKeeperContext>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnectionString")));
+            .AddEndpointsApiExplorer()
+            .AddSwaggerGen(options => options.SchemaGeneratorOptions.SupportNonNullableReferenceTypes = true)
+            .AddDbContext<AppDbContext>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnectionString")));
 
-        AddSwaggerGen();
-        AddMapper();
+        builder.Services
+            .AddAutoMapper()
+            .AddServices()
+            .AddFacades();
 
-        builder.AddFilesProvider();
+        IFileDirectoryProvider fileDirectoryProvider = new FileDirectoryProviderFactory().Create(builder.Configuration);
 
         builder.Services
             .AddSingleton<IDateTimeProvider, DateTimeProvider>()
             .AddSingleton<IPathConverter, PathConverter>()
-            .AddScoped<IEntityHelper, EntityHelper>()
-            .AddScoped<ICurrencyRepository, CurrencyRepository>()
-            .AddScoped<ICurrencyService, CurrencyService>()
-            .AddScoped<ICategoryRepository, CategoryRepository>()
-            .AddScoped<ICategoryService, CategoryService>()
-            .AddScoped<IExpenseRepository, ExpenseRepository>()
-            .AddScoped<IExpenseService, ExpenseService>();
+            .AddSingleton(fileDirectoryProvider)
+            .AddSingleton<IFileNameProvider, FileNameProvider>()
+            .AddScoped<IQueryService<EntityExistsQuery<Currency>, bool>, EntityExistsQueryService<Currency>>()
+            .AddScoped<IQueryService<EntityExistsQuery<Category>, bool>, EntityExistsQueryService<Category>>()
+            .AddScoped<IQueryService<EntityExistsQuery<Expense>, bool>, EntityExistsQueryService<Expense>>();
 
         return builder;
-
-        void AddSwaggerGen()
-        {
-            builder.Services
-                .AddEndpointsApiExplorer()
-                .AddSwaggerGen(options => options.SchemaGeneratorOptions.SupportNonNullableReferenceTypes = true);
-        }
-
-        void AddMapper()
-        {
-            IMapperConfiguration mapperConfiguration = new MapperConfigurationFactory().CreateMapperConfiguration();
-
-            builder.Services
-                .AddSingleton(mapperConfiguration)
-                .AddSingleton<IMapper, Mapper>();
-        }
     }
 
-    private static WebApplicationBuilder AddFilesProvider(this WebApplicationBuilder builder)
+    private static IServiceCollection AddAutoMapper(this IServiceCollection services)
     {
-        const string FolderNames = nameof(FolderNames);
-        const string ImagesFolder = nameof(ImagesFolder);
-        const string PdfFolder = nameof(PdfFolder);
+        IMapperConfiguration mapperConfiguration = new MapperConfigurationFactory().Create();
 
-        IConfigurationSection section = builder.Configuration.GetRequiredSection(FolderNames);
-        string imagesRootDirectory = Path.Combine(AppContext.BaseDirectory, section.GetRequiredSection(ImagesFolder).Value);
-        string pdfRootDirectory = Path.Combine(AppContext.BaseDirectory, section.GetRequiredSection(PdfFolder).Value);
+        services
+            .AddSingleton(mapperConfiguration)
+            .AddSingleton<IMapper, Mapper>();
 
-        builder.Services
-            .AddSingleton<FilesProviderBase, ImagesProvider>(_ => new ImagesProvider(imagesRootDirectory))
-            .AddSingleton<FilesProviderBase, PdfProvider>(_ => new PdfProvider(pdfRootDirectory))
-            .AddSingleton<IFilesProvider, FilesProvider>();
+        return services;
+    }
 
-        return builder;
+    private static IServiceCollection AddFacades(this IServiceCollection services)
+    {
+        foreach (Type type in Assembly.GetExecutingAssembly().GetTypes())
+        {
+            if (!type.IsAbstract && type.Name.EndsWith("Service"))
+            {
+                services.AddScoped(type.GetInterfaces().Single(), type);
+            }
+        }
+
+        return services;
+    }
+
+    private static IServiceCollection AddServices(this IServiceCollection services)
+    {
+        Assembly dataAssembly = typeof(AppDbContext).Assembly;
+        Assembly domainAssembly = typeof(IQuery<>).Assembly;
+
+        services
+            .AddAssemblyGenericTypesOf(typeof(ICommandService<,>), ServiceLifetime.Scoped, dataAssembly, domainAssembly)
+            .AddAssemblyGenericTypesOf(typeof(IQueryService<,>), ServiceLifetime.Scoped, dataAssembly, domainAssembly)
+            .AddAssemblyGenericTypesOf(typeof(IAsyncEventHandler<,>), ServiceLifetime.Scoped, domainAssembly);
+
+        return services;
+    }
+
+    private static IServiceCollection AddAssemblyGenericTypesOf(
+        this IServiceCollection services,
+        Type abstraction,
+        ServiceLifetime lifetime,
+        params Assembly[] assemblies)
+    {
+        List<Type> types = new List<Type>();
+
+        foreach (Assembly assembly in assemblies)
+        {
+            types.AddRange(assembly.GetTypes());
+        }
+
+        var mappings = from type in types
+                       where !type.IsAbstract && !type.IsGenericType
+                       from i in type.GetInterfaces()
+                       where i.IsGenericType
+                       let gType = i.GetGenericTypeDefinition()
+                       where gType == abstraction
+                       select (i, type);
+
+        foreach ((Type service, Type implementation) in mappings)
+        {
+            services.Add(new ServiceDescriptor(service, implementation, lifetime));
+        }
+
+        return services;
     }
 }

@@ -4,15 +4,15 @@ namespace MoneyKeeper.Domain.Tools;
 
 public sealed class PathConverter : IPathConverter
 {
-    public string FromUrl(string url)
+    public string FromLink(string link)
     {
-        if (string.IsNullOrWhiteSpace(url))
-            throw new ArgumentNullException(nameof(url));
+        if (string.IsNullOrWhiteSpace(link))
+            throw new ArgumentNullException(nameof(link));
 
-        return url.Replace('/', '\\');
+        return link.Replace('/', '\\');
     }
 
-    public string ToUrl(string path)
+    public string ToLink(string path)
     {
         if (string.IsNullOrWhiteSpace(path))
             throw new ArgumentNullException(nameof(path));

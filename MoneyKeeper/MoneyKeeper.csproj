@@ -11,6 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\MoneyKeeper.AutoMapper\MoneyKeeper.AutoMapper.csproj" />
     <ProjectReference Include="..\MoneyKeeper.Data\MoneyKeeper.Data.csproj" />
     <ProjectReference Include="..\MoneyKeeper.Domain\MoneyKeeper.Domain.csproj" />
   </ItemGroup>
