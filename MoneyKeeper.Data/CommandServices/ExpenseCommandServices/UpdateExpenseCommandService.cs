@@ -49,7 +49,6 @@ public sealed class UpdateExpenseCommandService : ICommandService<UpdateExpenseC
         }
 
         expense.Id = parameter.Id;
-        expense.Date = expense.Date.ToUniversalTime();
         expense.ModifiedAt = _dateTimeProvider.NowUtc;
 
         InvoiceUpdateResult invoiceUpdateResult = await UpdateInvoiceAsync(expense);
@@ -115,8 +114,6 @@ public sealed class UpdateExpenseCommandService : ICommandService<UpdateExpenseC
         }
 
         expense.Invoice.ExpenseId = expense.Id;
-
-        _dbContext.Update(expense.Invoice);
 
         return result;
     }

@@ -20,7 +20,10 @@ public sealed class ExpensesController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<DataResult<ExpenseDto>> Get() => await _queriesService.GetAsync();
+    public async Task<DataResult<ExpenseDto>> Get([FromQuery] ExpenseConditionDto expenseCondition)
+    {
+        return await _queriesService.GetAsync(expenseCondition);
+    }
 
     [HttpGet("{id}")]
     public async Task<ActionResult<ExpenseDto>> Get(Guid id)

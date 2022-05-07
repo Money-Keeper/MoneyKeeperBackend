@@ -10,7 +10,7 @@ public sealed class Expense : BaseModel
     public decimal Amount { get; set; }
 
     [Column("date")]
-    public DateTime Date { get; set; }
+    public long Date { get; set; }
 
     [Column("note"), StringLength(256)]
     public string? Note { get; set; }

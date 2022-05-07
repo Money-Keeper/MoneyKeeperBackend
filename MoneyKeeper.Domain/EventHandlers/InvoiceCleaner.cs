@@ -8,35 +8,33 @@ using MoneyKeeper.Domain.Tools.Abstractions;
 
 namespace MoneyKeeper.Domain.EventHandlers;
 
-public sealed class InvoiceCleaner : IAsyncEventHandler<ExpenseUpdatedEvent, EmptyEventResult>
+public sealed class InvoiceCleaner : IAsyncEventHandler<ExpenseUpdatedEvent>
 {
     private readonly IPathConverter _pathConverter;
-    private readonly ICommandService<DeleteFileCommand, EmptyCommandResult> _deleteFileCommand;
+    private readonly ICommandService<DeleteFileCommand, EmptyCommandResult> _deleteFileService;
 
     public InvoiceCleaner(
         IPathConverter pathConverter,
-        ICommandService<DeleteFileCommand, EmptyCommandResult> deleteFileCommand)
+        ICommandService<DeleteFileCommand, EmptyCommandResult> deleteFileService)
     {
         _pathConverter = pathConverter ?? throw new ArgumentNullException(nameof(pathConverter));
-        _deleteFileCommand = deleteFileCommand ?? throw new ArgumentNullException(nameof(deleteFileCommand));
+        _deleteFileService = deleteFileService ?? throw new ArgumentNullException(nameof(deleteFileService));
     }
 
-    public async Task<EmptyEventResult> Handle(ExpenseUpdatedEvent e)
+    public async Task HandleAsync(ExpenseUpdatedEvent e)
     {
         if (e.OldImageLink != null)
         {
             string fileRelativePath = _pathConverter.FromLink(e.OldImageLink);
 
-            await _deleteFileCommand.ExecuteAsync(new DeleteFileCommand(FileType.Image, fileRelativePath));
+            await _deleteFileService.ExecuteAsync(new DeleteFileCommand(FileType.Image, fileRelativePath));
         }
 
         if (e.OldPdfLink != null)
         {
             string fileRelativePath = _pathConverter.FromLink(e.OldPdfLink);
 
-            await _deleteFileCommand.ExecuteAsync(new DeleteFileCommand(FileType.Pdf, fileRelativePath));
+            await _deleteFileService.ExecuteAsync(new DeleteFileCommand(FileType.Pdf, fileRelativePath));
         }
-
-        return new EmptyEventResult();
     }
 }

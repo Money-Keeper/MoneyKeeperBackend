@@ -135,8 +135,8 @@ namespace MoneyKeeper.Data.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("currency_id");
 
-                    b.Property<DateTime>("Date")
-                        .HasColumnType("timestamp with time zone")
+                    b.Property<long>("Date")
+                        .HasColumnType("bigint")
                         .HasColumnName("date");
 
                     b.Property<DateTime?>("DeletedAt")

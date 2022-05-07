@@ -12,20 +12,20 @@ namespace MoneyKeeper.Facades.FileFacades;
 
 public sealed class ImageService : IImageService
 {
-    private readonly IQueryService<FileExistsQuery, bool> _fileExistsQuery;
-    private readonly IQueryService<GetFileQuery, byte[]> _getFileQuery;
-    private readonly ICommandService<CreateFileCommand, CreateFileCommandResult> _createFileCommand;
+    private readonly IQueryService<FileExistsQuery, bool> _fileExistsService;
+    private readonly IQueryService<GetFileQuery, byte[]> _getFileService;
+    private readonly ICommandService<CreateFileCommand, CreateFileCommandResult> _createFileService;
     private readonly IPathConverter _pathConverter;
 
     public ImageService(
-        IQueryService<FileExistsQuery, bool> fileExistsQuery,
-        IQueryService<GetFileQuery, byte[]> getFileQuery,
-        ICommandService<CreateFileCommand, CreateFileCommandResult> createFileCommand,
+        IQueryService<FileExistsQuery, bool> fileExistsService,
+        IQueryService<GetFileQuery, byte[]> getFileService,
+        ICommandService<CreateFileCommand, CreateFileCommandResult> createFileService,
         IPathConverter pathConverter)
     {
-        _fileExistsQuery = fileExistsQuery ?? throw new ArgumentNullException(nameof(fileExistsQuery));
-        _getFileQuery = getFileQuery ?? throw new ArgumentNullException(nameof(getFileQuery));
-        _createFileCommand = createFileCommand ?? throw new ArgumentNullException(nameof(createFileCommand));
+        _fileExistsService = fileExistsService ?? throw new ArgumentNullException(nameof(fileExistsService));
+        _getFileService = getFileService ?? throw new ArgumentNullException(nameof(getFileService));
+        _createFileService = createFileService ?? throw new ArgumentNullException(nameof(createFileService));
         _pathConverter = pathConverter ?? throw new ArgumentNullException(nameof(pathConverter));
     }
 
@@ -37,7 +37,7 @@ public sealed class ImageService : IImageService
 
         await stream.ReadAsync(image);
 
-        CreateFileCommandResult result = await _createFileCommand.ExecuteAsync(new CreateFileCommand(FileType.Image, image));
+        CreateFileCommandResult result = await _createFileService.ExecuteAsync(new CreateFileCommand(FileType.Image, image));
 
         return new FileLinkDto(_pathConverter.ToLink(result.FileRelativePath));
     }
@@ -46,14 +46,14 @@ public sealed class ImageService : IImageService
     {
         string path = _pathConverter.FromLink(link);
 
-        return _fileExistsQuery.ExecuteAsync(new FileExistsQuery(FileType.Image, path));
+        return _fileExistsService.ExecuteAsync(new FileExistsQuery(FileType.Image, path));
     }
 
     public async Task<FileContentResult> GetAsync(string link)
     {
         string path = _pathConverter.FromLink(link);
 
-        byte[] file = await _getFileQuery.ExecuteAsync(new GetFileQuery(FileType.Image, path));
+        byte[] file = await _getFileService.ExecuteAsync(new GetFileQuery(FileType.Image, path));
 
         return new FileContentResult(file, MediaTypeNames.Image.Jpeg);
     }

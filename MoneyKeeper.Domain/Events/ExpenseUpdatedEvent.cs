@@ -2,7 +2,7 @@
 
 namespace MoneyKeeper.Domain.Events;
 
-public sealed class ExpenseUpdatedEvent : IAsyncEvent<EmptyEventResult>
+public sealed class ExpenseUpdatedEvent : IAsyncEvent
 {
     public ExpenseUpdatedEvent(Guid expenseId, string? oldImageLink, string? oldPdfLink)
     {

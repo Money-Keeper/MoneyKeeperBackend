@@ -1,8 +1,6 @@
 ﻿namespace MoneyKeeper.Domain.Infrastructure.Events;
 
-public interface IAsyncEventHandler<TEvent, TResult>
-    where TEvent : IAsyncEvent<TResult>
-    where TResult : IEventResult
+public interface IAsyncEventHandler<TEvent> where TEvent : IAsyncEvent
 {
-    Task<TResult> Handle(TEvent e);
+    Task HandleAsync(TEvent e);
 }

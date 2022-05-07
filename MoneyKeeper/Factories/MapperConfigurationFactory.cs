@@ -1,4 +1,5 @@
 ﻿using MoneyKeeper.AutoMapper;
+using MoneyKeeper.AutoMapper.Abstractions;
 using MoneyKeeper.Domain.Models;
 using MoneyKeeper.Dtos;
 
@@ -6,7 +7,7 @@ namespace MoneyKeeper.Factories;
 
 internal class MapperConfigurationFactory
 {
-    public MapperConfiguration Create()
+    public IMapperConfiguration Create()
     {
         return new MapperConfiguration(
             cfg => cfg.CreateMap<NewCurrencyDto, Currency>(),

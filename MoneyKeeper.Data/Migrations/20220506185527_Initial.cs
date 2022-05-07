@@ -54,7 +54,7 @@ namespace MoneyKeeper.Data.Migrations
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false),
                     amount = table.Column<decimal>(type: "numeric", nullable: false),
-                    date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    date = table.Column<long>(type: "bigint", nullable: false),
                     note = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     currency_id = table.Column<Guid>(type: "uuid", nullable: false),
                     category_id = table.Column<Guid>(type: "uuid", nullable: false),

@@ -35,8 +35,6 @@ public sealed class CreateExpenseCommandService : ICommandService<CreateExpenseC
                 return new CreateExpenseCommandResult(null);
         }
 
-        expense.Date = expense.Date.ToUniversalTime();
-
         Guid result = _dbContext.Expenses.Add(expense).Entity.Id;
 
         await _dbContext.SaveChangesAsync();

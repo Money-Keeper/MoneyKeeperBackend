@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MoneyKeeper.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20220506172958_Initial")]
+    [Migration("20220506185527_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -137,8 +137,8 @@ namespace MoneyKeeper.Data.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("currency_id");
 
-                    b.Property<DateTime>("Date")
-                        .HasColumnType("timestamp with time zone")
+                    b.Property<long>("Date")
+                        .HasColumnType("bigint")
                         .HasColumnName("date");
 
                     b.Property<DateTime?>("DeletedAt")

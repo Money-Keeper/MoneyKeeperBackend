@@ -10,27 +10,27 @@ namespace MoneyKeeper.Facades.CurrencyFacades;
 public sealed class CurrencyCommandsService : ICurrencyCommandsService
 {
     private readonly IMapper _mapper;
-    private readonly ICommandService<CreateCurrencyCommand, CreateCurrencyCommandResult> _createCurrencyCommand;
-    private readonly ICommandService<UpdateCurrencyCommand, UpdateCurrencyCommandResult> _updateCurrencyCommand;
-    private readonly ICommandService<DeleteEntityCommand<Currency>, EmptyCommandResult> _deleteCurrencyCommand;
+    private readonly ICommandService<CreateCurrencyCommand, CreateCurrencyCommandResult> _createCurrencyService;
+    private readonly ICommandService<UpdateCurrencyCommand, UpdateCurrencyCommandResult> _updateCurrencyService;
+    private readonly ICommandService<DeleteEntityCommand<Currency>, EmptyCommandResult> _deleteCurrencyService;
 
     public CurrencyCommandsService(
         IMapper mapper,
-        ICommandService<CreateCurrencyCommand, CreateCurrencyCommandResult> createCurrencyCommand,
-        ICommandService<UpdateCurrencyCommand, UpdateCurrencyCommandResult> updateCurrencyCommand,
-        ICommandService<DeleteEntityCommand<Currency>, EmptyCommandResult> deleteCurrencyCommand)
+        ICommandService<CreateCurrencyCommand, CreateCurrencyCommandResult> createCurrencyService,
+        ICommandService<UpdateCurrencyCommand, UpdateCurrencyCommandResult> updateCurrencyService,
+        ICommandService<DeleteEntityCommand<Currency>, EmptyCommandResult> deleteCurrencyService)
     {
         _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
-        _createCurrencyCommand = createCurrencyCommand ?? throw new ArgumentNullException(nameof(createCurrencyCommand));
-        _updateCurrencyCommand = updateCurrencyCommand ?? throw new ArgumentNullException(nameof(updateCurrencyCommand));
-        _deleteCurrencyCommand = deleteCurrencyCommand ?? throw new ArgumentNullException(nameof(deleteCurrencyCommand));
+        _createCurrencyService = createCurrencyService ?? throw new ArgumentNullException(nameof(createCurrencyService));
+        _updateCurrencyService = updateCurrencyService ?? throw new ArgumentNullException(nameof(updateCurrencyService));
+        _deleteCurrencyService = deleteCurrencyService ?? throw new ArgumentNullException(nameof(deleteCurrencyService));
     }
 
     public async Task<CurrencyDto?> CreateAsync(NewCurrencyDto newCurrency)
     {
         Currency currency = _mapper.Map<NewCurrencyDto, Currency>(newCurrency)!;
 
-        CreateCurrencyCommandResult result = await _createCurrencyCommand.ExecuteAsync(new CreateCurrencyCommand(currency));
+        CreateCurrencyCommandResult result = await _createCurrencyService.ExecuteAsync(new CreateCurrencyCommand(currency));
 
         CurrencyDto? resultDto = _mapper.Map<Currency, CurrencyDto>(result.Data);
 
@@ -39,14 +39,14 @@ public sealed class CurrencyCommandsService : ICurrencyCommandsService
 
     public Task DeleteAsync(Guid id)
     {
-        return _deleteCurrencyCommand.ExecuteAsync(new DeleteEntityCommand<Currency>(id));
+        return _deleteCurrencyService.ExecuteAsync(new DeleteEntityCommand<Currency>(id));
     }
 
     public async Task<CurrencyDto?> UpdateAsync(Guid id, NewCurrencyDto newCurrency)
     {
         Currency currency = _mapper.Map<NewCurrencyDto, Currency>(newCurrency)!;
 
-        UpdateCurrencyCommandResult result = await _updateCurrencyCommand.ExecuteAsync(new UpdateCurrencyCommand(id, currency));
+        UpdateCurrencyCommandResult result = await _updateCurrencyService.ExecuteAsync(new UpdateCurrencyCommand(id, currency));
 
         CurrencyDto? resultDto = _mapper.Map<Currency, CurrencyDto>(result.Data);
 

@@ -33,12 +33,10 @@ internal static class AppBuilderConfiguration
             .AddServices()
             .AddFacades();
 
-        IFileDirectoryProvider fileDirectoryProvider = new FileDirectoryProviderFactory().Create(builder.Configuration);
-
         builder.Services
             .AddSingleton<IDateTimeProvider, DateTimeProvider>()
             .AddSingleton<IPathConverter, PathConverter>()
-            .AddSingleton(fileDirectoryProvider)
+            .AddSingleton<IFileDirectoryProvider>(_ => new FileDirectoryProviderFactory().Create(builder.Configuration))
             .AddSingleton<IFileNameProvider, FileNameProvider>()
             .AddScoped<IQueryService<EntityExistsQuery<Currency>, bool>, EntityExistsQueryService<Currency>>()
             .AddScoped<IQueryService<EntityExistsQuery<Category>, bool>, EntityExistsQueryService<Category>>()
@@ -49,10 +47,8 @@ internal static class AppBuilderConfiguration
 
     private static IServiceCollection AddAutoMapper(this IServiceCollection services)
     {
-        IMapperConfiguration mapperConfiguration = new MapperConfigurationFactory().Create();
-
         services
-            .AddSingleton(mapperConfiguration)
+            .AddSingleton<IMapperConfiguration>(_ => new MapperConfigurationFactory().Create())
             .AddSingleton<IMapper, Mapper>();
 
         return services;
@@ -79,7 +75,7 @@ internal static class AppBuilderConfiguration
         services
             .AddAssemblyGenericTypesOf(typeof(ICommandService<,>), ServiceLifetime.Scoped, dataAssembly, domainAssembly)
             .AddAssemblyGenericTypesOf(typeof(IQueryService<,>), ServiceLifetime.Scoped, dataAssembly, domainAssembly)
-            .AddAssemblyGenericTypesOf(typeof(IAsyncEventHandler<,>), ServiceLifetime.Scoped, domainAssembly);
+            .AddAssemblyGenericTypesOf(typeof(IAsyncEventHandler<>), ServiceLifetime.Scoped, domainAssembly);
 
         return services;
     }

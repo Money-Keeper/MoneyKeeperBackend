@@ -10,37 +10,39 @@ namespace MoneyKeeper.Facades.ExpenseFacades;
 public sealed class ExpenseQueriesService : IExpenseQueriesService
 {
     private readonly IMapper _mapper;
-    private readonly IQueryService<EntityExistsQuery<Expense>, bool> _expenseExistsQuery;
-    private readonly IQueryService<GetExpenseByIdQuery, Expense?> _getExpenseByIdQuery;
-    private readonly IQueryService<GetExpensesByConditionQuery, IEnumerable<Expense>> _getExpensesByConditionQuery;
+    private readonly IQueryService<EntityExistsQuery<Expense>, bool> _expenseExistsService;
+    private readonly IQueryService<GetExpenseByIdQuery, Expense?> _getExpenseByIdService;
+    private readonly IQueryService<GetExpensesByConditionQuery, IEnumerable<Expense>> _getExpensesByConditionService;
 
     public ExpenseQueriesService(
         IMapper mapper,
-        IQueryService<EntityExistsQuery<Expense>, bool> expenseExistsQuery,
-        IQueryService<GetExpenseByIdQuery, Expense?> getExpenseByIdQuery,
-        IQueryService<GetExpensesByConditionQuery, IEnumerable<Expense>> getExpensesByConditionQuery)
+        IQueryService<EntityExistsQuery<Expense>, bool> expenseExistsService,
+        IQueryService<GetExpenseByIdQuery, Expense?> getExpenseByIdService,
+        IQueryService<GetExpensesByConditionQuery, IEnumerable<Expense>> getExpensesByConditionService)
     {
         _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
-        _expenseExistsQuery = expenseExistsQuery ?? throw new ArgumentNullException(nameof(expenseExistsQuery));
-        _getExpenseByIdQuery = getExpenseByIdQuery ?? throw new ArgumentNullException(nameof(getExpenseByIdQuery));
-        _getExpensesByConditionQuery = getExpensesByConditionQuery ?? throw new ArgumentNullException(nameof(getExpensesByConditionQuery));
+        _expenseExistsService = expenseExistsService ?? throw new ArgumentNullException(nameof(expenseExistsService));
+        _getExpenseByIdService = getExpenseByIdService ?? throw new ArgumentNullException(nameof(getExpenseByIdService));
+        _getExpensesByConditionService = getExpensesByConditionService ?? throw new ArgumentNullException(nameof(getExpensesByConditionService));
     }
 
     public Task<bool> ExistsAsync(Guid id)
     {
-        return _expenseExistsQuery.ExecuteAsync(new EntityExistsQuery<Expense>(id));
+        return _expenseExistsService.ExecuteAsync(new EntityExistsQuery<Expense>(id));
     }
 
     public async Task<ExpenseDto?> GetAsync(Guid id)
     {
-        Expense? result = await _getExpenseByIdQuery.ExecuteAsync(new GetExpenseByIdQuery(id));
+        Expense? result = await _getExpenseByIdService.ExecuteAsync(new GetExpenseByIdQuery(id));
 
         return _mapper.Map<Expense, ExpenseDto>(result);
     }
 
-    public async Task<DataResult<ExpenseDto>> GetAsync()
+    public async Task<DataResult<ExpenseDto>> GetAsync(ExpenseConditionDto condition)
     {
-        IEnumerable<Expense> result = await _getExpensesByConditionQuery.ExecuteAsync(new GetExpensesByConditionQuery());
+        var query = new GetExpensesByConditionQuery(condition.CategoryId!.Value, condition.DateFrom, condition.DateTo);
+
+        IEnumerable<Expense> result = await _getExpensesByConditionService.ExecuteAsync(query);
         IEnumerable<ExpenseDto> resultDto = _mapper.Map<Expense, ExpenseDto>(result);
 
         return new DataResult<ExpenseDto>(resultDto);

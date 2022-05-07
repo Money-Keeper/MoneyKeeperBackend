@@ -10,37 +10,37 @@ namespace MoneyKeeper.Facades.CurrencyFacades;
 public sealed class CurrencyQueriesService : ICurrencyQueriesService
 {
     private readonly IMapper _mapper;
-    private readonly IQueryService<EntityExistsQuery<Currency>, bool> _currencyExistsQuery;
-    private readonly IQueryService<GetCurrencyByIdQuery, Currency?> _getCurrencyByIdQuery;
-    private readonly IQueryService<GetCurrenciesQuery, IEnumerable<Currency>> _getCurrenciesQuery;
+    private readonly IQueryService<EntityExistsQuery<Currency>, bool> _currencyExistsService;
+    private readonly IQueryService<GetCurrencyByIdQuery, Currency?> _getCurrencyByIdService;
+    private readonly IQueryService<GetCurrenciesQuery, IEnumerable<Currency>> _getCurrenciesService;
 
     public CurrencyQueriesService(
         IMapper mapper,
-        IQueryService<EntityExistsQuery<Currency>, bool> currencyExistsQuery,
-        IQueryService<GetCurrencyByIdQuery, Currency?> getCurrencyByIdQuery,
-        IQueryService<GetCurrenciesQuery, IEnumerable<Currency>> getCurrenciesQuery)
+        IQueryService<EntityExistsQuery<Currency>, bool> currencyExistsService,
+        IQueryService<GetCurrencyByIdQuery, Currency?> getCurrencyByIdService,
+        IQueryService<GetCurrenciesQuery, IEnumerable<Currency>> getCurrenciesService)
     {
         _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
-        _currencyExistsQuery = currencyExistsQuery ?? throw new ArgumentNullException(nameof(currencyExistsQuery));
-        _getCurrencyByIdQuery = getCurrencyByIdQuery ?? throw new ArgumentNullException(nameof(getCurrencyByIdQuery));
-        _getCurrenciesQuery = getCurrenciesQuery ?? throw new ArgumentNullException(nameof(getCurrenciesQuery));
+        _currencyExistsService = currencyExistsService ?? throw new ArgumentNullException(nameof(currencyExistsService));
+        _getCurrencyByIdService = getCurrencyByIdService ?? throw new ArgumentNullException(nameof(getCurrencyByIdService));
+        _getCurrenciesService = getCurrenciesService ?? throw new ArgumentNullException(nameof(getCurrenciesService));
     }
 
     public Task<bool> ExistsAsync(Guid id)
     {
-        return _currencyExistsQuery.ExecuteAsync(new EntityExistsQuery<Currency>(id));
+        return _currencyExistsService.ExecuteAsync(new EntityExistsQuery<Currency>(id));
     }
 
     public async Task<CurrencyDto?> GetAsync(Guid id)
     {
-        Currency? result = await _getCurrencyByIdQuery.ExecuteAsync(new GetCurrencyByIdQuery(id));
+        Currency? result = await _getCurrencyByIdService.ExecuteAsync(new GetCurrencyByIdQuery(id));
 
         return _mapper.Map<Currency, CurrencyDto>(result);
     }
 
     public async Task<DataResult<CurrencyDto>> GetAsync()
     {
-        IEnumerable<Currency> result = await _getCurrenciesQuery.ExecuteAsync(new GetCurrenciesQuery());
+        IEnumerable<Currency> result = await _getCurrenciesService.ExecuteAsync(new GetCurrenciesQuery());
         IEnumerable<CurrencyDto> resultDto = _mapper.Map<Currency, CurrencyDto>(result);
 
         return new DataResult<CurrencyDto>(resultDto);
