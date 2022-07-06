@@ -1,13 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MoneyKeeper.Dtos;
 using MoneyKeeper.Facades.FileFacades;
+using MoneyKeeper.Infrastructure.Attributes;
 using System.Net.Mime;
 
 namespace MoneyKeeper.Controllers;
 
-[ApiController]
-[Route("api/img")]
-[Produces(MediaTypeNames.Application.Json)]
+[ApiController, Route("api/img"), Authorize, Produces(MediaTypeNames.Application.Json)]
 public sealed class ImagesController : ControllerBase
 {
     private readonly IImageService _imageService;

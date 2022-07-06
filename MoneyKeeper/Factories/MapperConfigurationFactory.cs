@@ -5,7 +5,7 @@ using MoneyKeeper.Dtos;
 
 namespace MoneyKeeper.Factories;
 
-internal class MapperConfigurationFactory
+internal sealed class MapperConfigurationFactory
 {
     public IMapperConfiguration Create()
     {
@@ -22,7 +22,10 @@ internal class MapperConfigurationFactory
             cfg => cfg.CreateMap<Expense, ExpenseDto>()
                 .AddCustomMap(s => nameof(s.Currency), t => nameof(t.Currency))
                 .AddCustomMap(s => nameof(s.Category), t => nameof(t.Category))
-                .AddCustomMap(s => nameof(s.Invoice), t => nameof(t.Invoice))
+                .AddCustomMap(s => nameof(s.Invoice), t => nameof(t.Invoice)),
+            cfg => cfg.CreateMap<RegistrationRequest, User>(),
+            cfg => cfg.CreateMap<User, UserDto>(),
+            cfg => cfg.CreateMap<Wallet, WalletDto>()
             );
     }
 }

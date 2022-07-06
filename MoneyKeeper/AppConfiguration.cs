@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MoneyKeeper.Data;
-using MoneyKeeper.Middleware;
+using MoneyKeeper.Infrastructure.Middleware;
 
 namespace MoneyKeeper;
 
@@ -25,10 +25,8 @@ internal static class AppConfiguration
 
         IExceptionHandler exceptionHandler = new ExceptionHandler();
 
-        app.UseExceptionHandler(a => a.Run(exceptionHandler.Handle));
-
-        //app.UseAuthorization();
-
+        app.UseMiddleware<JwtAuthorizationMiddleware>();
+        app.UseExceptionHandler(a => a.Run(exceptionHandler.HandleAsync));
         app.MapControllers();
 
         return app;

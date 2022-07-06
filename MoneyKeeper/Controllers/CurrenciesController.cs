@@ -1,13 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MoneyKeeper.Dtos;
 using MoneyKeeper.Facades.CurrencyFacades;
+using MoneyKeeper.Infrastructure.Attributes;
 using System.Net.Mime;
 
 namespace MoneyKeeper.Controllers;
 
-[ApiController]
-[Route("api/currencies")]
-[Produces(MediaTypeNames.Application.Json)]
+[ApiController, Route("api/currencies"), Authorize, Produces(MediaTypeNames.Application.Json)]
 public sealed class CurrenciesController : ControllerBase
 {
     private readonly ICurrencyQueriesService _queriesService;

@@ -49,10 +49,28 @@ namespace MoneyKeeper.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "user",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false),
+                    login = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
+                    name = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
+                    password_hash = table.Column<string>(type: "character varying(60)", maxLength: 60, nullable: false),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()"),
+                    modified_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_user", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "expense",
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false),
+                    wallet_id = table.Column<Guid>(type: "uuid", nullable: false),
                     amount = table.Column<decimal>(type: "numeric", nullable: false),
                     date = table.Column<long>(type: "bigint", nullable: false),
                     note = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
@@ -75,6 +93,27 @@ namespace MoneyKeeper.Data.Migrations
                         name: "FK_expense_currency_currency_id",
                         column: x => x.currency_id,
                         principalTable: "currency",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "wallet",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false),
+                    user_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()"),
+                    modified_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_wallet", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_wallet_user_user_id",
+                        column: x => x.user_id,
+                        principalTable: "user",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -113,6 +152,11 @@ namespace MoneyKeeper.Data.Migrations
                 name: "IX_expense_currency_id",
                 table: "expense",
                 column: "currency_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_wallet_user_id",
+                table: "wallet",
+                column: "user_id");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -121,7 +165,13 @@ namespace MoneyKeeper.Data.Migrations
                 name: "invoice");
 
             migrationBuilder.DropTable(
+                name: "wallet");
+
+            migrationBuilder.DropTable(
                 name: "expense");
+
+            migrationBuilder.DropTable(
+                name: "user");
 
             migrationBuilder.DropTable(
                 name: "category");

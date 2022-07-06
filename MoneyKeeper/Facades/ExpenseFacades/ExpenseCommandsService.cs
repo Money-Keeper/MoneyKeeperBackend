@@ -55,6 +55,7 @@ public sealed class ExpenseCommandsService : IExpenseCommandsService
         {
             var e = new ExpenseUpdatedEvent(result.Data.Value, result.OldImageLink, result.OldPdfLink);
 
+            // TODO: Refactor to background task.
             await _expenseUpdatedHandler.HandleAsync(e);
         }
 

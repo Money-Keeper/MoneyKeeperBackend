@@ -44,6 +44,8 @@ public sealed class CreateExpenseCommandService : ICommandService<CreateExpenseC
 
     private async Task<bool> NestedEntitiesExistsAsync(Expense expense)
     {
+        // TODO: Need to refactor.
+
         bool currencyExists = await _dbContext.EntityExistsAsync<Currency>(expense.CurrencyId);
         bool categoryExists = await _dbContext.EntityExistsAsync<Category>(expense.CategoryId);
 

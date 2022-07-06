@@ -1,21 +1,19 @@
 ﻿using MoneyKeeper.Domain.Providers;
 using MoneyKeeper.Domain.Providers.Abstractions;
+using MoneyKeeper.Infrastructure.Settings;
+using MoneyKeeper.Services.Abstractions;
 
 namespace MoneyKeeper.Factories;
 
-internal class FileDirectoryProviderFactory
+internal sealed class FileDirectoryProviderFactory
 {
-    public IFileDirectoryProvider Create(IConfiguration appConfig)
+    public IFileDirectoryProvider Create(ISettingsService settingsService)
     {
-        ArgumentNullException.ThrowIfNull(appConfig, nameof(appConfig));
+        ArgumentNullException.ThrowIfNull(settingsService, nameof(settingsService));
 
-        const string FolderNames = nameof(FolderNames);
-        const string ImagesFolder = nameof(ImagesFolder);
-        const string PdfFolder = nameof(PdfFolder);
-
-        IConfigurationSection section = appConfig.GetRequiredSection(FolderNames);
-        string imagesRootDirectory = Path.Combine(AppContext.BaseDirectory, section.GetRequiredSection(ImagesFolder).Value);
-        string pdfRootDirectory = Path.Combine(AppContext.BaseDirectory, section.GetRequiredSection(PdfFolder).Value);
+        FoldersSettings settings = settingsService.GetSettings<FoldersSettings>();
+        string imagesRootDirectory = Path.Combine(AppContext.BaseDirectory, settings.ImagesFolderName);
+        string pdfRootDirectory = Path.Combine(AppContext.BaseDirectory, settings.PdfFolderName);
 
         return new FileDirectoryProvider(imagesRootDirectory, pdfRootDirectory);
     }

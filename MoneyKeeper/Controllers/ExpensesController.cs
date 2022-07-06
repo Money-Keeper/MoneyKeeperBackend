@@ -1,13 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MoneyKeeper.Dtos;
 using MoneyKeeper.Facades.ExpenseFacades;
+using MoneyKeeper.Infrastructure.Attributes;
 using System.Net.Mime;
 
 namespace MoneyKeeper.Controllers;
 
-[ApiController]
-[Route("api/expenses")]
-[Produces(MediaTypeNames.Application.Json)]
+[ApiController, Route("api/expenses"), Authorize, Produces(MediaTypeNames.Application.Json)]
 public sealed class ExpensesController : ControllerBase
 {
     private readonly IExpenseQueriesService _queriesService;

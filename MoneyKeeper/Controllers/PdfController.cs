@@ -1,13 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MoneyKeeper.Dtos;
 using MoneyKeeper.Facades.FileFacades;
+using MoneyKeeper.Infrastructure.Attributes;
 using System.Net.Mime;
 
 namespace MoneyKeeper.Controllers;
 
-[ApiController]
-[Route("api/pdf")]
-[Produces(MediaTypeNames.Application.Json)]
+[ApiController, Route("api/pdf"), Authorize, Produces(MediaTypeNames.Application.Json)]
 public sealed class PdfController : ControllerBase
 {
     private readonly IPdfService _pdfService;

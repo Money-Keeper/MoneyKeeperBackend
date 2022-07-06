@@ -12,7 +12,12 @@ using MoneyKeeper.Domain.Providers.Abstractions;
 using MoneyKeeper.Domain.Queries;
 using MoneyKeeper.Domain.Tools;
 using MoneyKeeper.Domain.Tools.Abstractions;
+using MoneyKeeper.Facades.FileFacades;
 using MoneyKeeper.Factories;
+using MoneyKeeper.Infrastructure.Settings;
+using MoneyKeeper.Infrastructure.UserContext;
+using MoneyKeeper.Services;
+using MoneyKeeper.Services.Abstractions;
 using System.Reflection;
 
 namespace MoneyKeeper;
@@ -24,9 +29,14 @@ internal static class AppBuilderConfiguration
         builder.Services.AddControllers();
 
         builder.Services
+            .AddHttpContextAccessor()
             .AddEndpointsApiExplorer()
             .AddSwaggerGen(options => options.SchemaGeneratorOptions.SupportNonNullableReferenceTypes = true)
-            .AddDbContext<AppDbContext>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnectionString")));
+            .AddDbContext<AppDbContext>((serviceProvider, options) =>
+            {
+                var settings = serviceProvider.GetRequiredService<ISettingsService>().GetSettings<DbSettings>();
+                options.UseNpgsql(settings.ConnectionString);
+            });
 
         builder.Services
             .AddAutoMapper()
@@ -34,10 +44,23 @@ internal static class AppBuilderConfiguration
             .AddFacades();
 
         builder.Services
+            .AddSingleton<IUserContext, UserContext>()
             .AddSingleton<IDateTimeProvider, DateTimeProvider>()
             .AddSingleton<IPathConverter, PathConverter>()
-            .AddSingleton<IFileDirectoryProvider>(_ => new FileDirectoryProviderFactory().Create(builder.Configuration))
             .AddSingleton<IFileNameProvider, FileNameProvider>()
+            .AddSingleton<IPasswordHashProvider, PasswordHashProvider>()
+            .AddSingleton<ISettingsService, SettingsService>()
+            .AddSingleton<IJwtService, JwtService>()
+            .AddSingleton<TokenValidationParametersFactory>()
+            .AddSingleton<IFileDirectoryProvider>(serviceProvider =>
+            {
+                var settingsService = serviceProvider.GetRequiredService<ISettingsService>();
+                return new FileDirectoryProviderFactory().Create(settingsService);
+            })
+            .AddScoped<IRegistrationService, RegistrationService>()
+            .AddScoped<IAuthenticationService, AuthenticationService>()
+            .AddScoped<IImageService, ImageService>()
+            .AddScoped<IPdfService, PdfService>()
             .AddScoped<IQueryService<EntityExistsQuery<Currency>, bool>, EntityExistsQueryService<Currency>>()
             .AddScoped<IQueryService<EntityExistsQuery<Category>, bool>, EntityExistsQueryService<Category>>()
             .AddScoped<IQueryService<EntityExistsQuery<Expense>, bool>, EntityExistsQueryService<Expense>>();
@@ -47,18 +70,18 @@ internal static class AppBuilderConfiguration
 
     private static IServiceCollection AddAutoMapper(this IServiceCollection services)
     {
-        services
+        return services
             .AddSingleton<IMapperConfiguration>(_ => new MapperConfigurationFactory().Create())
             .AddSingleton<IMapper, Mapper>();
-
-        return services;
     }
 
     private static IServiceCollection AddFacades(this IServiceCollection services)
     {
         foreach (Type type in Assembly.GetExecutingAssembly().GetTypes())
         {
-            if (!type.IsAbstract && type.Name.EndsWith("Service"))
+            bool validTypeName = type.Name.EndsWith("CommandsService") || type.Name.EndsWith("QueriesService");
+
+            if (!type.IsAbstract && validTypeName)
             {
                 services.AddScoped(type.GetInterfaces().Single(), type);
             }

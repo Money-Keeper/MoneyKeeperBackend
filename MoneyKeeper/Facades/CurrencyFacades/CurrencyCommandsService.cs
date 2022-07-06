@@ -32,9 +32,7 @@ public sealed class CurrencyCommandsService : ICurrencyCommandsService
 
         CreateCurrencyCommandResult result = await _createCurrencyService.ExecuteAsync(new CreateCurrencyCommand(currency));
 
-        CurrencyDto? resultDto = _mapper.Map<Currency, CurrencyDto>(result.Data);
-
-        return resultDto;
+        return _mapper.Map<Currency, CurrencyDto>(result.Data);
     }
 
     public Task DeleteAsync(Guid id)
@@ -48,8 +46,6 @@ public sealed class CurrencyCommandsService : ICurrencyCommandsService
 
         UpdateCurrencyCommandResult result = await _updateCurrencyService.ExecuteAsync(new UpdateCurrencyCommand(id, currency));
 
-        CurrencyDto? resultDto = _mapper.Map<Currency, CurrencyDto>(result.Data);
-
-        return resultDto;
+        return _mapper.Map<Currency, CurrencyDto>(result.Data);
     }
 }

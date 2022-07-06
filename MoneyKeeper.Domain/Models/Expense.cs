@@ -6,6 +6,9 @@ namespace MoneyKeeper.Domain.Models;
 [Table("expense")]
 public sealed class Expense : BaseModel
 {
+    [Column("wallet_id")]
+    public Guid WalletId { get; set; }
+
     [Column("amount")]
     public decimal Amount { get; set; }
 
@@ -17,10 +20,13 @@ public sealed class Expense : BaseModel
 
     [Column("currency_id")]
     public Guid CurrencyId { get; set; }
-    public Currency Currency { get; set; } = null!;
+
+    public Currency Currency { get; set; } = default!;
 
     [Column("category_id")]
     public Guid CategoryId { get; set; }
-    public Category Category { get; set; } = null!;
+
+    public Category Category { get; set; } = default!;
+
     public Invoice? Invoice { get; set; }
 }

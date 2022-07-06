@@ -1,14 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MoneyKeeper.Dtos;
 using MoneyKeeper.Facades.CategoryFacades;
+using MoneyKeeper.Infrastructure.Attributes;
 using System.Globalization;
 using System.Net.Mime;
 
 namespace MoneyKeeper.Controllers;
 
-[ApiController]
-[Route("api/categories")]
-[Produces(MediaTypeNames.Application.Json)]
+[ApiController, Route("api/categories"), Authorize, Produces(MediaTypeNames.Application.Json)]
 public sealed class CategoriesController : ControllerBase
 {
     private readonly ICategoryQueriesService _queriesService;

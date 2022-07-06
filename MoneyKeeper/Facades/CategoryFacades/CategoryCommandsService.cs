@@ -32,9 +32,7 @@ public sealed class CategoryCommandsService : ICategoryCommandsService
 
         CreateCategoryCommandResult result = await _createCategoryService.ExecuteAsync(new CreateCategoryCommand(category));
 
-        CategoryDto? resultDto = _mapper.Map<Category, CategoryDto>(result.Data);
-
-        return resultDto;
+        return _mapper.Map<Category, CategoryDto>(result.Data);
     }
 
     public Task DeleteAsync(Guid id)
@@ -48,8 +46,6 @@ public sealed class CategoryCommandsService : ICategoryCommandsService
 
         UpdateCategoryCommandResult result = await _updateCategoryService.ExecuteAsync(new UpdateCategoryCommand(id, category));
 
-        CategoryDto? resultDto = _mapper.Map<Category, CategoryDto>(result.Data);
-
-        return resultDto;
+        return _mapper.Map<Category, CategoryDto>(result.Data);
     }
 }

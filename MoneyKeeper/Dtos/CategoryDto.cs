@@ -8,10 +8,10 @@ public class CategoryDto
     public Guid Id { get; set; }
 
     [Required, StringLength(32, MinimumLength = 1)]
-    public string? Name { get; set; }
+    public string Name { get; set; } = default!;
 
     [Required, StringLength(6, MinimumLength = 6)]
-    public string? Color { get; set; }
+    public string Color { get; set; } = default!;
 
     public CategoryDto? ParentCategory { get; set; }
 }

@@ -5,12 +5,24 @@ namespace MoneyKeeper.Dtos;
 
 public class ExpenseDto
 {
+    [Required]
     public Guid Id { get; set; }
+
+    [Required]
     public decimal Amount { get; set; }
+
+    [Required]
     public long Date { get; set; }
+
+    [StringLength(256)]
     public string? Note { get; set; }
-    public CurrencyDto Currency { get; set; } = null!;
-    public CategoryDto Category { get; set; } = null!;
+
+    [Required]
+    public CurrencyDto Currency { get; set; } = default!;
+
+    [Required]
+    public CategoryDto Category { get; set; } = default!;
+
     public InvoiceDto? Invoice { get; set; }
 }
 
@@ -28,6 +40,7 @@ public class NewExpenseDto
     [Required, BindProperty(Name = "categoryId")]
     public Guid? CategoryId { get; set; }
 
+    [StringLength(256)]
     public string? Note { get; set; }
 
     public InvoiceDto? Invoice { get; set; }
