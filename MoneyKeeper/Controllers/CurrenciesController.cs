@@ -1,30 +1,27 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using MoneyKeeper.Controllers.Abstractions;
 using MoneyKeeper.Dtos;
-using MoneyKeeper.Facades.CurrencyFacades;
-using MoneyKeeper.Infrastructure.Attributes;
-using System.Net.Mime;
+using MoneyKeeper.Facades.CurrencyFacades.Abstractions;
 
 namespace MoneyKeeper.Controllers;
 
-[ApiController, Route("api/currencies"), Authorize, Produces(MediaTypeNames.Application.Json)]
-public sealed class CurrenciesController : ControllerBase
+[Route("api/currencies")]
+public sealed class CurrenciesController : BaseController
 {
-    private readonly ICurrencyQueriesService _queriesService;
-    private readonly ICurrencyCommandsService _commandsService;
+    private readonly ICurrenciesService _currenciesService;
 
-    public CurrenciesController(ICurrencyQueriesService queriesService, ICurrencyCommandsService commandsService)
+    public CurrenciesController(ICurrenciesService currenciesService)
     {
-        _queriesService = queriesService ?? throw new ArgumentNullException(nameof(queriesService));
-        _commandsService = commandsService ?? throw new ArgumentNullException(nameof(commandsService));
+        _currenciesService = currenciesService ?? throw new ArgumentNullException(nameof(currenciesService));
     }
 
     [HttpGet]
-    public async Task<DataResult<CurrencyDto>> Get() => await _queriesService.GetAsync();
+    public Task<DataResult<CurrencyDto>> Get() => _currenciesService.GetAsync();
 
     [HttpGet("{id}")]
     public async Task<ActionResult<CurrencyDto>> Get(Guid id)
     {
-        CurrencyDto? result = await _queriesService.GetAsync(id);
+        CurrencyDto? result = await _currenciesService.GetAsync(id);
 
         if (result is null)
             return NotFound();
@@ -33,41 +30,31 @@ public sealed class CurrenciesController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<CurrencyDto>> Post(NewCurrencyDto newCurrencyDto)
+    public Task<CurrencyDto> Post(NewCurrencyDto newCurrencyDto)
     {
-        CurrencyDto? result = await _commandsService.CreateAsync(newCurrencyDto);
-
-        if (result is null)
-            return BadRequest();
-
-        return result;
+        return _currenciesService.CreateAsync(newCurrencyDto);
     }
 
     [HttpPut("{id}")]
     public async Task<ActionResult<CurrencyDto>> Put(Guid id, NewCurrencyDto newCurrencyDto)
     {
-        bool exists = await _queriesService.ExistsAsync(id);
+        bool exists = await _currenciesService.ExistsAsync(id);
 
         if (!exists)
             return NotFound();
 
-        CurrencyDto? result = await _commandsService.UpdateAsync(id, newCurrencyDto);
-
-        if (result is null)
-            return BadRequest();
-
-        return result;
+        return await _currenciesService.UpdateAsync(id, newCurrencyDto);
     }
 
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(Guid id)
     {
-        bool exists = await _queriesService.ExistsAsync(id);
+        bool exists = await _currenciesService.ExistsAsync(id);
 
         if (!exists)
             return NotFound();
 
-        await _commandsService.DeleteAsync(id);
+        await _currenciesService.DeleteAsync(id);
 
         return NoContent();
     }

@@ -20,14 +20,6 @@ public sealed class UpdateCategoryCommandService : ICommandService<UpdateCategor
     {
         Category category = parameter.NewCategory;
 
-        if (category.ParentCategoryId.HasValue)
-        {
-            bool isCategoryExists = await _dbContext.EntityExistsAsync<Category>(category.ParentCategoryId.Value);
-
-            if (!isCategoryExists)
-                return new UpdateCategoryCommandResult(null);
-        }
-
         category.Id = parameter.Id;
         category.ModifiedAt = _dateTimeProvider.NowUtc;
 

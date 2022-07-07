@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using MoneyKeeper.AutoMapper;
 using MoneyKeeper.AutoMapper.Abstractions;
 using MoneyKeeper.Data;
@@ -12,13 +13,13 @@ using MoneyKeeper.Domain.Providers.Abstractions;
 using MoneyKeeper.Domain.Queries;
 using MoneyKeeper.Domain.Tools;
 using MoneyKeeper.Domain.Tools.Abstractions;
-using MoneyKeeper.Facades.FileFacades;
 using MoneyKeeper.Factories;
 using MoneyKeeper.Infrastructure.Settings;
 using MoneyKeeper.Infrastructure.UserContext;
 using MoneyKeeper.Services;
 using MoneyKeeper.Services.Abstractions;
 using System.Reflection;
+using System.Text.Json;
 
 namespace MoneyKeeper;
 
@@ -26,7 +27,13 @@ internal static class AppBuilderConfiguration
 {
     public static WebApplicationBuilder ConfigureBuilder(this WebApplicationBuilder builder)
     {
-        builder.Services.AddControllers();
+        builder.Services
+            .AddControllers()
+            .AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.DictionaryKeyPolicy = JsonNamingPolicy.CamelCase;
+                options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+            });
 
         builder.Services
             .AddHttpContextAccessor()
@@ -37,11 +44,6 @@ internal static class AppBuilderConfiguration
                 var settings = serviceProvider.GetRequiredService<ISettingsService>().GetSettings<DbSettings>();
                 options.UseNpgsql(settings.ConnectionString);
             });
-
-        builder.Services
-            .AddAutoMapper()
-            .AddServices()
-            .AddFacades();
 
         builder.Services
             .AddSingleton<IUserContext, UserContext>()
@@ -57,13 +59,14 @@ internal static class AppBuilderConfiguration
                 var settingsService = serviceProvider.GetRequiredService<ISettingsService>();
                 return new FileDirectoryProviderFactory().Create(settingsService);
             })
-            .AddScoped<IRegistrationService, RegistrationService>()
-            .AddScoped<IAuthenticationService, AuthenticationService>()
-            .AddScoped<IImageService, ImageService>()
-            .AddScoped<IPdfService, PdfService>()
             .AddScoped<IQueryService<EntityExistsQuery<Currency>, bool>, EntityExistsQueryService<Currency>>()
             .AddScoped<IQueryService<EntityExistsQuery<Category>, bool>, EntityExistsQueryService<Category>>()
             .AddScoped<IQueryService<EntityExistsQuery<Expense>, bool>, EntityExistsQueryService<Expense>>();
+
+        builder.Services
+            .AddAutoMapper()
+            .AddServices()
+            .AddFacades();
 
         return builder;
     }
@@ -79,11 +82,11 @@ internal static class AppBuilderConfiguration
     {
         foreach (Type type in Assembly.GetExecutingAssembly().GetTypes())
         {
-            bool validTypeName = type.Name.EndsWith("CommandsService") || type.Name.EndsWith("QueriesService");
+            bool validTypeName = type.Name.EndsWith("Commands") || type.Name.EndsWith("Queries");
 
             if (!type.IsAbstract && validTypeName)
             {
-                services.AddScoped(type.GetInterfaces().Single(), type);
+                services.TryAddScoped(type.GetInterfaces().Single(), type);
             }
         }
 
@@ -92,8 +95,17 @@ internal static class AppBuilderConfiguration
 
     private static IServiceCollection AddServices(this IServiceCollection services)
     {
+        Assembly webApiAssembly = Assembly.GetExecutingAssembly();
         Assembly dataAssembly = typeof(AppDbContext).Assembly;
         Assembly domainAssembly = typeof(IQuery<>).Assembly;
+
+        foreach (Type type in webApiAssembly.GetTypes())
+        {
+            if (!type.IsAbstract && type.Name.EndsWith("Service"))
+            {
+                services.TryAddScoped(type.GetInterfaces().Single(), type);
+            }
+        }
 
         services
             .AddAssemblyGenericTypesOf(typeof(ICommandService<,>), ServiceLifetime.Scoped, dataAssembly, domainAssembly)
@@ -126,7 +138,7 @@ internal static class AppBuilderConfiguration
 
         foreach ((Type service, Type implementation) in mappings)
         {
-            services.Add(new ServiceDescriptor(service, implementation, lifetime));
+            services.TryAdd(new ServiceDescriptor(service, implementation, lifetime));
         }
 
         return services;

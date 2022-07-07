@@ -4,12 +4,12 @@ using MoneyKeeper.Domain.Models;
 
 namespace MoneyKeeper.Domain.Commands.CategoryCommands;
 
-public sealed class CreateCategoryCommandResult : ICommandResult, IDataResult<Category?>
+public sealed class CreateCategoryCommandResult : ICommandResult, IDataResult<Category>
 {
-    public CreateCategoryCommandResult(Category? data)
+    public CreateCategoryCommandResult(Category data)
     {
-        Data = data;
+        Data = data ?? throw new ArgumentNullException(nameof(data));
     }
 
-    public Category? Data { get; }
+    public Category Data { get; }
 }

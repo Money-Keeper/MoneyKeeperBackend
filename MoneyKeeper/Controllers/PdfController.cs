@@ -1,13 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using MoneyKeeper.Controllers.Abstractions;
 using MoneyKeeper.Dtos;
-using MoneyKeeper.Facades.FileFacades;
-using MoneyKeeper.Infrastructure.Attributes;
-using System.Net.Mime;
+using MoneyKeeper.Facades.FileFacades.Abstractions;
+using MoneyKeeper.Validation.Abstractions;
 
 namespace MoneyKeeper.Controllers;
 
-[ApiController, Route("api/pdf"), Authorize, Produces(MediaTypeNames.Application.Json)]
-public sealed class PdfController : ControllerBase
+[Route("api/pdf")]
+public sealed class PdfController : BaseController
 {
     private readonly IPdfService _pdfService;
 
@@ -19,8 +19,10 @@ public sealed class PdfController : ControllerBase
     [HttpGet("{**link}")]
     public async Task<IActionResult> Get(string link)
     {
-        if (!_pdfService.IsValidLink(link))
-            return BadRequest();
+        IValidationResult validationResult = _pdfService.ValidateLink(link);
+
+        if (validationResult.IsFailed)
+            return BadRequest(validationResult);
 
         bool fileExists = await _pdfService.ExistsAsync(link);
 
@@ -31,5 +33,5 @@ public sealed class PdfController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<FileLinkDto>> Post(IFormFile file) => await _pdfService.CreateAsync(file);
+    public Task<FileLinkDto> Post(IFormFile file) => _pdfService.CreateAsync(file);
 }

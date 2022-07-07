@@ -1,35 +1,37 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using MoneyKeeper.Controllers.Abstractions;
 using MoneyKeeper.Dtos;
-using MoneyKeeper.Facades.FileFacades;
-using MoneyKeeper.Infrastructure.Attributes;
-using System.Net.Mime;
+using MoneyKeeper.Facades.FileFacades.Abstractions;
+using MoneyKeeper.Validation.Abstractions;
 
 namespace MoneyKeeper.Controllers;
 
-[ApiController, Route("api/img"), Authorize, Produces(MediaTypeNames.Application.Json)]
-public sealed class ImagesController : ControllerBase
+[Route("api/img")]
+public sealed class ImagesController : BaseController
 {
-    private readonly IImageService _imageService;
+    private readonly IImagesService _imagesService;
 
-    public ImagesController(IImageService imageService)
+    public ImagesController(IImagesService imageService)
     {
-        _imageService = imageService ?? throw new ArgumentNullException(nameof(imageService));
+        _imagesService = imageService ?? throw new ArgumentNullException(nameof(imageService));
     }
 
     [HttpGet("{**link}")]
     public async Task<IActionResult> Get(string link)
     {
-        if (!_imageService.IsValidLink(link))
-            return BadRequest();
+        IValidationResult validationResult = _imagesService.ValidateLink(link);
 
-        bool fileExists = await _imageService.ExistsAsync(link);
+        if (validationResult.IsFailed)
+            return BadRequest(validationResult);
+
+        bool fileExists = await _imagesService.ExistsAsync(link);
 
         if (!fileExists)
             return NotFound();
 
-        return await _imageService.GetAsync(link);
+        return await _imagesService.GetAsync(link);
     }
 
     [HttpPost]
-    public async Task<ActionResult<FileLinkDto>> Post(IFormFile file) => await _imageService.CreateAsync(file);
+    public Task<FileLinkDto> Post(IFormFile file) => _imagesService.CreateAsync(file);
 }

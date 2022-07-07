@@ -1,10 +1,11 @@
-﻿using MoneyKeeper.Domain.Commands.UserCommands;
+﻿using MoneyKeeper.Domain.Commands;
+using MoneyKeeper.Domain.Commands.UserCommands;
 using MoneyKeeper.Domain.Infrastructure.Commands;
 using MoneyKeeper.Domain.Models;
 
 namespace MoneyKeeper.Data.CommandServices.UserCommandServices;
 
-public sealed class CreateUserCommandService : ICommandService<CreateUserCommand, CreateUserCommandResult>
+public sealed class CreateUserCommandService : ICommandService<CreateUserCommand, EmptyCommandResult>
 {
     private readonly AppDbContext _dbContext;
 
@@ -13,7 +14,7 @@ public sealed class CreateUserCommandService : ICommandService<CreateUserCommand
         _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
     }
 
-    public async Task<CreateUserCommandResult> ExecuteAsync(CreateUserCommand parameter)
+    public async Task<EmptyCommandResult> ExecuteAsync(CreateUserCommand parameter)
     {
         Guid result = _dbContext.Users.Add(parameter.NewUser).Entity.Id;
 
@@ -21,6 +22,6 @@ public sealed class CreateUserCommandService : ICommandService<CreateUserCommand
 
         await _dbContext.SaveChangesAsync();
 
-        return new CreateUserCommandResult(result);
+        return new EmptyCommandResult();
     }
 }

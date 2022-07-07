@@ -2,7 +2,7 @@
 
 internal sealed class UserContext : IUserContext
 {
-    private const string UserId = nameof(UserId);
+    private const string Login = nameof(Login);
 
     private readonly IHttpContextAccessor _contextAccessor;
 
@@ -11,7 +11,6 @@ internal sealed class UserContext : IUserContext
         _contextAccessor = contextAccessor ?? throw new ArgumentNullException(nameof(contextAccessor));
     }
 
-    public Guid? CurrentUserId => _contextAccessor.HttpContext?.Items[UserId] as Guid?;
-    public bool IsAuthorized => _contextAccessor.HttpContext?.Items[UserId] != null;
-
+    public bool IsAuthorized => _contextAccessor.HttpContext?.Items[Login] != null;
+    public string? CurrentUserLogin => _contextAccessor.HttpContext?.Items[Login] as string;
 }

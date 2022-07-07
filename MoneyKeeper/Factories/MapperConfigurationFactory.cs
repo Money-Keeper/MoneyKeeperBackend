@@ -2,6 +2,7 @@
 using MoneyKeeper.AutoMapper.Abstractions;
 using MoneyKeeper.Domain.Models;
 using MoneyKeeper.Dtos;
+using MoneyKeeper.Registration.Dtos;
 
 namespace MoneyKeeper.Factories;
 

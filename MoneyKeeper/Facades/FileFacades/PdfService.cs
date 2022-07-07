@@ -1,64 +1,62 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using MoneyKeeper.Domain.Commands.FileCommands;
 using MoneyKeeper.Domain.Constants;
-using MoneyKeeper.Domain.Infrastructure.Commands;
-using MoneyKeeper.Domain.Infrastructure.Queries;
-using MoneyKeeper.Domain.Queries.FileQueries;
 using MoneyKeeper.Domain.Tools.Abstractions;
 using MoneyKeeper.Dtos;
+using MoneyKeeper.Facades.FileFacades.Abstractions;
+using MoneyKeeper.Validation;
+using MoneyKeeper.Validation.Abstractions;
 using System.Net.Mime;
 
 namespace MoneyKeeper.Facades.FileFacades;
 
-public sealed class PdfService : IPdfService
+internal sealed class PdfService : IPdfService
 {
-    private readonly IQueryService<FileExistsQuery, bool> _fileExistsService;
-    private readonly IQueryService<GetFileQuery, byte[]> _getFileService;
-    private readonly ICommandService<CreateFileCommand, CreateFileCommandResult> _createFileService;
     private readonly IPathConverter _pathConverter;
+    private readonly IFileCommands _fileCommands;
+    private readonly IFileQueries _fileQueries;
 
-    public PdfService(
-        IQueryService<FileExistsQuery, bool> fileExistsService,
-        IQueryService<GetFileQuery, byte[]> getFileService,
-        ICommandService<CreateFileCommand, CreateFileCommandResult> createFileService,
-        IPathConverter pathConverter)
+    public PdfService(IPathConverter pathConverter, IFileCommands fileCommands, IFileQueries fileQueries)
     {
-        _fileExistsService = fileExistsService ?? throw new ArgumentNullException(nameof(fileExistsService));
-        _getFileService = getFileService ?? throw new ArgumentNullException(nameof(getFileService));
-        _createFileService = createFileService ?? throw new ArgumentNullException(nameof(createFileService));
         _pathConverter = pathConverter ?? throw new ArgumentNullException(nameof(pathConverter));
+        _fileCommands = fileCommands ?? throw new ArgumentNullException(nameof(fileCommands));
+        _fileQueries = fileQueries ?? throw new ArgumentNullException(nameof(fileQueries));
     }
 
     public async Task<FileLinkDto> CreateAsync(IFormFile file)
     {
         using Stream stream = file.OpenReadStream();
-
         byte[] pdf = new byte[stream.Length];
 
         await stream.ReadAsync(pdf);
 
-        CreateFileCommandResult result = await _createFileService.ExecuteAsync(new CreateFileCommand(FileType.Pdf, pdf));
-
-        return new FileLinkDto(_pathConverter.ToLink(result.FileRelativePath));
+        string result = await _fileCommands.CreateAsync(FileType.Pdf, pdf);
+        return new FileLinkDto(_pathConverter.ToLink(result));
     }
 
     public Task<bool> ExistsAsync(string link)
     {
-        string path = _pathConverter.FromLink(link);
-
-        return _fileExistsService.ExecuteAsync(new FileExistsQuery(FileType.Pdf, path));
+        return _fileQueries.ExistsAsync(FileType.Pdf, _pathConverter.FromLink(link));
     }
 
     public async Task<FileContentResult> GetAsync(string link)
     {
-        string path = _pathConverter.FromLink(link);
-
-        byte[] file = await _getFileService.ExecuteAsync(new GetFileQuery(FileType.Pdf, path));
-
-        return new FileContentResult(file, MediaTypeNames.Application.Pdf);
+        byte[] result = await _fileQueries.GetAsync(FileType.Pdf, _pathConverter.FromLink(link));
+        return new FileContentResult(result, MediaTypeNames.Application.Pdf);
     }
 
-    public bool IsValidLink(string link)
+    public IValidationResult ValidateLink(string link)
+    {
+        var result = new ValidationResult();
+
+        if (!IsValidLink(link))
+        {
+            result.AddError(nameof(link), "Invalid link");
+        }
+
+        return result;
+    }
+
+    private bool IsValidLink(string link)
     {
         return link.EndsWith(FileExtensions.Pdf);
     }

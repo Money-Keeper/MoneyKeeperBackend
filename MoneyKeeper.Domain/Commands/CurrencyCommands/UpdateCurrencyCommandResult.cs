@@ -4,12 +4,12 @@ using MoneyKeeper.Domain.Models;
 
 namespace MoneyKeeper.Domain.Commands.CurrencyCommands;
 
-public sealed class UpdateCurrencyCommandResult : ICommandResult, IDataResult<Currency?>
+public sealed class UpdateCurrencyCommandResult : ICommandResult, IDataResult<Currency>
 {
-    public UpdateCurrencyCommandResult(Currency? data)
+    public UpdateCurrencyCommandResult(Currency data)
     {
-        Data = data;
+        Data = data ?? throw new ArgumentNullException(nameof(data));
     }
 
-    public Currency? Data { get; }
+    public Currency Data { get; }
 }

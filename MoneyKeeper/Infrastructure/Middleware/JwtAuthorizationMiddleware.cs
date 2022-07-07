@@ -4,7 +4,7 @@ namespace MoneyKeeper.Infrastructure.Middleware;
 
 internal sealed class JwtAuthorizationMiddleware
 {
-    private const string UserId = nameof(UserId);
+    private const string Login = nameof(Login);
     private const string AuthorizationHeader = "Authorization";
     private const int TokenPrefixLength = 7;
 
@@ -21,9 +21,9 @@ internal sealed class JwtAuthorizationMiddleware
     {
         string? token = context.Request.Headers[AuthorizationHeader].FirstOrDefault()?.Substring(TokenPrefixLength);
 
-        if (token != null && _jwtService.ValidateToken(token, out Guid? userId))
+        if (token != null && _jwtService.ValidateToken(token, out string? login))
         {
-            context.Items[UserId] = userId;
+            context.Items[Login] = login;
         }
 
         await _next(context);

@@ -1,25 +1,24 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using MoneyKeeper.Controllers.Abstractions;
 using MoneyKeeper.Dtos;
-using MoneyKeeper.Facades.UserFacades;
-using MoneyKeeper.Infrastructure.Attributes;
-using System.Net.Mime;
+using MoneyKeeper.Facades.UserFacades.Abstractions;
 
 namespace MoneyKeeper.Controllers;
 
-[ApiController, Route("api/users"), Authorize, Produces(MediaTypeNames.Application.Json)]
-public sealed class UsersController : ControllerBase
+[Route("api/users")]
+public sealed class UsersController : BaseController
 {
-    private readonly IUserQueriesService _queriesService;
+    private readonly IUsersService _usersService;
 
-    public UsersController(IUserQueriesService queriesService)
+    public UsersController(IUsersService usersService)
     {
-        _queriesService = queriesService ?? throw new ArgumentNullException(nameof(queriesService));
+        _usersService = usersService ?? throw new ArgumentNullException(nameof(usersService));
     }
 
-    [HttpGet("{id}")]
-    public async Task<ActionResult<UserDto>> Get(Guid id)
+    [HttpGet("{login}")]
+    public async Task<ActionResult<UserDto>> Get(string login)
     {
-        UserDto? result = await _queriesService.GetAsync(id);
+        UserDto? result = await _usersService.GetAsync(login);
 
         if (result is null)
             return NotFound();

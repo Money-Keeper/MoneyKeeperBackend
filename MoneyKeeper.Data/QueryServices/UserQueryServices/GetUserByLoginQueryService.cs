@@ -18,6 +18,7 @@ public sealed class GetUserByLoginQueryService : IQueryService<GetUserByLoginQue
     {
         return _dbContext.Users
             .AsNoTracking()
+            .Include(x => x.Wallets)
             .Where(x => x.DeletedAt == null)
             .FirstOrDefaultAsync(x => x.Login == parameter.Login);
     }

@@ -1,7 +1,9 @@
-﻿namespace MoneyKeeper.Infrastructure.UserContext;
+﻿using MoneyKeeper.Domain.Models;
+
+namespace MoneyKeeper.Infrastructure.UserContext;
 
 public interface IUserContext
 {
-    Guid? CurrentUserId { get; }
     bool IsAuthorized { get; }
+    string? CurrentUserLogin { get; }
 }

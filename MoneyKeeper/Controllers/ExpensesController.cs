@@ -1,33 +1,33 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using MoneyKeeper.Controllers.Abstractions;
 using MoneyKeeper.Dtos;
-using MoneyKeeper.Facades.ExpenseFacades;
-using MoneyKeeper.Infrastructure.Attributes;
-using System.Net.Mime;
+using MoneyKeeper.Facades.ExpenseFacades.Abstractions;
+using MoneyKeeper.Validation.Abstractions;
 
 namespace MoneyKeeper.Controllers;
 
-[ApiController, Route("api/expenses"), Authorize, Produces(MediaTypeNames.Application.Json)]
-public sealed class ExpensesController : ControllerBase
+[Route("api/expenses")]
+public sealed class ExpensesController : BaseController
 {
-    private readonly IExpenseQueriesService _queriesService;
-    private readonly IExpenseCommandsService _commandsService;
+    private readonly IValidationService<NewExpenseDto> _validationService;
+    private readonly IExpensesService _expensesService;
 
-    public ExpensesController(IExpenseQueriesService queriesService, IExpenseCommandsService commandsService)
+    public ExpensesController(IValidationService<NewExpenseDto> validationService, IExpensesService expensesService)
     {
-        _queriesService = queriesService ?? throw new ArgumentNullException(nameof(queriesService));
-        _commandsService = commandsService ?? throw new ArgumentNullException(nameof(commandsService));
+        _validationService = validationService ?? throw new ArgumentNullException(nameof(validationService));
+        _expensesService = expensesService ?? throw new ArgumentNullException(nameof(expensesService));
     }
 
     [HttpGet]
-    public async Task<DataResult<ExpenseDto>> Get([FromQuery] ExpenseConditionDto expenseCondition)
+    public Task<DataResult<ExpenseDto>> Get([FromQuery] ExpenseConditionDto expenseCondition)
     {
-        return await _queriesService.GetAsync(expenseCondition);
+        return _expensesService.GetAsync(expenseCondition);
     }
 
     [HttpGet("{id}")]
     public async Task<ActionResult<ExpenseDto>> Get(Guid id)
     {
-        ExpenseDto? result = await _queriesService.GetAsync(id);
+        ExpenseDto? result = await _expensesService.GetAsync(id);
 
         if (result is null)
             return NotFound();
@@ -38,43 +38,39 @@ public sealed class ExpensesController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<ExpenseDto>> Post(NewExpenseDto newExpenseDto)
     {
-        Guid? resultId = await _commandsService.CreateAsync(newExpenseDto);
+        IValidationResult validationResult = await _validationService.ValidateAsync(newExpenseDto);
 
-        if (!resultId.HasValue)
-            return BadRequest();
+        if (validationResult.IsFailed)
+            return BadRequest(validationResult);
 
-        ExpenseDto result = (await _queriesService.GetAsync(resultId.Value))!;
-
-        return result;
+        return await _expensesService.CreateAsync(newExpenseDto);
     }
 
     [HttpPut("{id}")]
     public async Task<ActionResult<ExpenseDto>> Put(Guid id, NewExpenseDto newExpenseDto)
     {
-        bool exists = await _queriesService.ExistsAsync(id);
+        bool exists = await _expensesService.ExistsAsync(id);
 
         if (!exists)
             return NotFound();
 
-        Guid? resultId = await _commandsService.UpdateAsync(id, newExpenseDto);
+        IValidationResult validationResult = await _validationService.ValidateAsync(newExpenseDto);
 
-        if (!resultId.HasValue)
-            return BadRequest();
+        if (validationResult.IsFailed)
+            return BadRequest(validationResult);
 
-        ExpenseDto result = (await _queriesService.GetAsync(resultId.Value))!;
-
-        return result!;
+        return await _expensesService.UpdateAsync(id, newExpenseDto);
     }
 
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(Guid id)
     {
-        bool exists = await _queriesService.ExistsAsync(id);
+        bool exists = await _expensesService.ExistsAsync(id);
 
         if (!exists)
             return NotFound();
 
-        await _commandsService.DeleteAsync(id);
+        await _expensesService.DeleteAsync(id);
 
         return NoContent();
     }
