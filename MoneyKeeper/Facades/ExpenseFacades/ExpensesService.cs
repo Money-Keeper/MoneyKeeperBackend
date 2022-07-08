@@ -43,7 +43,7 @@ internal sealed class ExpensesService : IExpensesService
         return _mapper.Map<Expense, ExpenseDto>(result);
     }
 
-    public async Task<DataResult<ExpenseDto>> GetAsync(ExpenseConditionDto condition)
+    public async Task<DataResult<ExpenseDto>> GetAsync(ExpenseQueryCondition condition)
     {
         IEnumerable<Expense> result = await _expenseQueries.GetAsync(condition);
         return new DataResult<ExpenseDto>(_mapper.Map<Expense, ExpenseDto>(result));

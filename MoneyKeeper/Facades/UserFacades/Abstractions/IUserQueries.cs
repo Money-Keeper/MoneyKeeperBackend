@@ -4,5 +4,5 @@ namespace MoneyKeeper.Facades.UserFacades.Abstractions;
 
 internal interface IUserQueries
 {
-    Task<User?> GetAsync(string login);
+    Task<User?> GetAsync(Guid id);
 }

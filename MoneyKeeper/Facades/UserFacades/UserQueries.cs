@@ -7,15 +7,15 @@ namespace MoneyKeeper.Facades.UserFacades;
 
 internal sealed class UserQueries : IUserQueries
 {
-    private readonly IQueryService<GetUserByLoginQuery, User?> _getUserByLoginService;
+    private readonly IQueryService<GetUserByIdQuery, User?> _getUserByIdService;
 
-    public UserQueries(IQueryService<GetUserByLoginQuery, User?> getUserByLoginService)
+    public UserQueries(IQueryService<GetUserByIdQuery, User?> getUserByIdService)
     {
-        _getUserByLoginService = getUserByLoginService ?? throw new ArgumentNullException(nameof(getUserByLoginService));
+        _getUserByIdService = getUserByIdService ?? throw new ArgumentNullException(nameof(getUserByIdService));
     }
 
-    public Task<User?> GetAsync(string login)
+    public Task<User?> GetAsync(Guid id)
     {
-        return _getUserByLoginService.ExecuteAsync(new GetUserByLoginQuery(login));
+        return _getUserByIdService.ExecuteAsync(new GetUserByIdQuery(id));
     }
 }

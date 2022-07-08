@@ -15,10 +15,10 @@ public sealed class UsersController : BaseController
         _usersService = usersService ?? throw new ArgumentNullException(nameof(usersService));
     }
 
-    [HttpGet("{login}")]
-    public async Task<ActionResult<UserDto>> Get(string login)
+    [HttpGet]
+    public async Task<ActionResult<UserDto>> Get()
     {
-        UserDto? result = await _usersService.GetAsync(login);
+        UserDto? result = await _usersService.GetAsync();
 
         if (result is null)
             return NotFound();

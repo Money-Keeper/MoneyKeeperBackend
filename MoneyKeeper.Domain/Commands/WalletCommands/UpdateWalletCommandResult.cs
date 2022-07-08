@@ -4,9 +4,9 @@ using MoneyKeeper.Domain.Models;
 
 namespace MoneyKeeper.Domain.Commands.WalletCommands;
 
-public sealed class CreateWalletCommandResult : ICommandResult, IDataResult<Wallet>
+public sealed class UpdateWalletCommandResult : ICommandResult, IDataResult<Wallet>
 {
-    public CreateWalletCommandResult(Wallet data)
+    public UpdateWalletCommandResult(Wallet data)
     {
         Data = data ?? throw new ArgumentNullException(nameof(data));
     }

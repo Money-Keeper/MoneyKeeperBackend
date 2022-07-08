@@ -3,14 +3,14 @@ using MoneyKeeper.Domain.Models;
 
 namespace MoneyKeeper.Domain.Commands.WalletCommands;
 
-public sealed class CreateWalletCommand : ICommand<CreateWalletCommandResult>
+public sealed class UpdateWalletCommand : ICommand<UpdateWalletCommandResult>
 {
-    public CreateWalletCommand(Wallet newWallet, Guid userId)
+    public UpdateWalletCommand(Guid id, Wallet newWallet)
     {
+        Id = id;
         NewWallet = newWallet ?? throw new ArgumentNullException(nameof(newWallet));
-        UserId = userId;
     }
 
+    public Guid Id { get; }
     public Wallet NewWallet { get; }
-    public Guid UserId { get; }
 }

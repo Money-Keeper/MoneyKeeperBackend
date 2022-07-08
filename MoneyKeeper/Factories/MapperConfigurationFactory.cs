@@ -26,7 +26,8 @@ internal sealed class MapperConfigurationFactory
                 .AddCustomMap(s => nameof(s.Invoice), t => nameof(t.Invoice)),
             cfg => cfg.CreateMap<RegistrationRequest, User>(),
             cfg => cfg.CreateMap<User, UserDto>(),
-            cfg => cfg.CreateMap<Wallet, WalletDto>()
+            cfg => cfg.CreateMap<Wallet, WalletDto>(),
+            cfg => cfg.CreateMap<NewWalletDto, Wallet>()
             );
     }
 }

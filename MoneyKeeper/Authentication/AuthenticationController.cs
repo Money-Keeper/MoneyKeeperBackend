@@ -29,6 +29,6 @@ public sealed class AuthenticationController : BaseController
         if (validationResult.IsFailed)
             return BadRequest(validationResult);
 
-        return _authenticationService.Authenticate(request);
+        return await _authenticationService.AuthenticateAsync(request);
     }
 }

@@ -11,7 +11,7 @@ namespace MoneyKeeper.Services;
 
 internal sealed class JwtService : IJwtService
 {
-    private const string LoginClaim = "login";
+    private const string IdClaim = "id";
     private const string ExpirationClaim = "exp";
 
     private readonly ISettingsService _settingsService;
@@ -30,11 +30,8 @@ internal sealed class JwtService : IJwtService
         _jwtHandler = new JwtSecurityTokenHandler();
     }
 
-    public string GetToken(string login, TimeSpan? lifeTime = null)
+    public string GetToken(Guid userId, TimeSpan? lifeTime = null)
     {
-        if (string.IsNullOrWhiteSpace(login))
-            throw new ArgumentNullException(nameof(login));
-
         JwtSettings settings = _settingsService.GetSettings<JwtSettings>();
         DateTime expiresTime = _dateTimeProvider.NowUtc.Add(lifeTime ?? settings.DefaultLifetime);
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(settings.Key));
@@ -42,14 +39,14 @@ internal sealed class JwtService : IJwtService
         var jwt = new JwtSecurityToken(
             issuer: settings.Issuer,
             audience: settings.Audience,
-            claims: new[] { new Claim(LoginClaim, login) },
+            claims: new[] { new Claim(IdClaim, userId.ToString()) },
             expires: expiresTime,
             signingCredentials: new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature));
 
         return _jwtHandler.WriteToken(jwt);
     }
 
-    public bool ValidateToken(string token, out string? login)
+    public bool ValidateToken(string token, out Guid? userId)
     {
         if (string.IsNullOrWhiteSpace(token))
             throw new ArgumentNullException(nameof(token));
@@ -62,13 +59,13 @@ internal sealed class JwtService : IJwtService
 
             var jwt = (JwtSecurityToken)validatedToken;
 
-            login = jwt.Claims.Single(x => x.Type == LoginClaim).Value;
+            userId = new Guid(jwt.Claims.Single(x => x.Type == IdClaim).Value);
         }
         catch
         {
-            login = null;
+            userId = null;
         }
 
-        return login != null;
+        return userId != null;
     }
 }

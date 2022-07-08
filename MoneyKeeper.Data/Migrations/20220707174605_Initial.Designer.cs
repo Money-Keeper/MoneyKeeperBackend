@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MoneyKeeper.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20220705174750_Initial")]
+    [Migration("20220707174605_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -258,6 +258,12 @@ namespace MoneyKeeper.Data.Migrations
                     b.Property<DateTime?>("ModifiedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("modified_at");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("character varying(32)")
+                        .HasColumnName("name");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid")

@@ -46,7 +46,7 @@ public class NewExpenseDto
     public InvoiceDto? Invoice { get; set; }
 }
 
-public class ExpenseConditionDto
+public class ExpenseQueryCondition
 {
     [Required, FromQuery(Name = "categoryId")]
     public Guid? CategoryId { get; set; }

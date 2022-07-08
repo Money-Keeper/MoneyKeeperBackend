@@ -15,10 +15,14 @@ public sealed class CreateWalletCommandService : ICommandService<CreateWalletCom
 
     public async Task<CreateWalletCommandResult> ExecuteAsync(CreateWalletCommand parameter)
     {
-        Wallet result = _dbContext.Wallets.Add(parameter.NewWallet).Entity;
+        Wallet wallet = parameter.NewWallet;
+
+        wallet.UserId = parameter.UserId;
+
+        _dbContext.Wallets.Add(wallet);
 
         await _dbContext.SaveChangesAsync();
 
-        return new CreateWalletCommandResult(result);
+        return new CreateWalletCommandResult(wallet);
     }
 }

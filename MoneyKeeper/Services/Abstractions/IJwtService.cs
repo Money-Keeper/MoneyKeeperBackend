@@ -2,6 +2,6 @@
 
 internal interface IJwtService
 {
-    string GetToken(string login, TimeSpan? lifetime = null);
-    bool ValidateToken(string token, out string? login);
+    string GetToken(Guid userId, TimeSpan? lifetime = null);
+    bool ValidateToken(string token, out Guid? userId);
 }

@@ -3,7 +3,7 @@ using MoneyKeeper.Domain.Models;
 
 namespace MoneyKeeper.Domain.Commands.UserCommands;
 
-public sealed class CreateUserCommand : ICommand<EmptyCommandResult>
+public sealed class CreateUserCommand : ICommand<CreateUserCommandResult>
 {
     public CreateUserCommand(User newUser)
     {

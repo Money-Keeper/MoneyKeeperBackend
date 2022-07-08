@@ -2,14 +2,17 @@
 
 namespace MoneyKeeper.Dtos;
 
-public class WalletDto
+public sealed class WalletDto
 {
     [Required]
     public Guid Id { get; set; }
+
+    [Required, StringLength(32, MinimumLength = 1)]
+    public string? Name { get; set; }
 }
 
-public class NewWalletDto
+public sealed class NewWalletDto
 {
-    [Required]
-    public Guid? UserId { get; set; }
+    [Required, StringLength(32, MinimumLength = 1)]
+    public string? Name { get; set; }
 }

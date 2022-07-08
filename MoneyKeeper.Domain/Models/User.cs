@@ -14,6 +14,4 @@ public sealed class User : BaseModel
 
     [Column("password_hash"), StringLength(60)]
     public string PasswordHash { get; set; } = default!;
-
-    public IEnumerable<Wallet> Wallets { get; set; } = default!;
 }

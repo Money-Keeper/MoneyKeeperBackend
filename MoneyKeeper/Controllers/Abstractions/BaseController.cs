@@ -12,4 +12,9 @@ public abstract class BaseController : ControllerBase
     {
         return new BadRequestObjectResult(validationResult);
     }
+
+    protected new NotFoundObjectResult NotFound()
+    {
+        return new NotFoundObjectResult(null);
+    }
 }

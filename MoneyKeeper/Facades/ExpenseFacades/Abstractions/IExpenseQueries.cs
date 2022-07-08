@@ -7,5 +7,5 @@ internal interface IExpenseQueries
 {
     Task<bool> ExistsAsync(Guid id);
     Task<Expense?> GetAsync(Guid id);
-    Task<IEnumerable<Expense>> GetAsync(ExpenseConditionDto condition);
+    Task<IEnumerable<Expense>> GetAsync(ExpenseQueryCondition condition);
 }

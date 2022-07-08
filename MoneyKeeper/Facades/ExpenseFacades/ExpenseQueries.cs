@@ -33,7 +33,7 @@ internal sealed class ExpenseQueries : IExpenseQueries
         return _getExpenseByIdService.ExecuteAsync(new GetExpenseByIdQuery(id));
     }
 
-    public Task<IEnumerable<Expense>> GetAsync(ExpenseConditionDto condition)
+    public Task<IEnumerable<Expense>> GetAsync(ExpenseQueryCondition condition)
     {
         var query = new GetExpensesByConditionQuery(
             categoryId: condition.CategoryId!.Value,

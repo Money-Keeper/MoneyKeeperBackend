@@ -18,7 +18,6 @@ public sealed class GetUserByIdQueryService : IQueryService<GetUserByIdQuery, Us
     {
         return _dbContext.Users
             .AsNoTracking()
-            .Include(x => x.Wallets)
             .Where(x => x.DeletedAt == null)
             .FirstOrDefaultAsync(x => x.Id == parameter.Id);
     }

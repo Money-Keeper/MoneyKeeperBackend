@@ -19,9 +19,9 @@ public sealed class ExpensesController : BaseController
     }
 
     [HttpGet]
-    public Task<DataResult<ExpenseDto>> Get([FromQuery] ExpenseConditionDto expenseCondition)
+    public Task<DataResult<ExpenseDto>> Get([FromQuery] ExpenseQueryCondition condition)
     {
-        return _expensesService.GetAsync(expenseCondition);
+        return _expensesService.GetAsync(condition);
     }
 
     [HttpGet("{id}")]

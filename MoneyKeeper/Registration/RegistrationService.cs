@@ -1,5 +1,4 @@
 ﻿using MoneyKeeper.AutoMapper.Abstractions;
-using MoneyKeeper.Domain.Commands;
 using MoneyKeeper.Domain.Commands.UserCommands;
 using MoneyKeeper.Domain.Infrastructure.Commands;
 using MoneyKeeper.Domain.Models;
@@ -13,13 +12,13 @@ namespace MoneyKeeper.Registration;
 internal sealed class RegistrationService : IRegistrationService
 {
     private readonly IMapper _mapper;
-    private readonly ICommandService<CreateUserCommand, EmptyCommandResult> _createUserService;
+    private readonly ICommandService<CreateUserCommand, CreateUserCommandResult> _createUserService;
     private readonly IPasswordHashProvider _hashProvider;
     private readonly IJwtService _jwtService;
 
     public RegistrationService(
         IMapper mapper,
-        ICommandService<CreateUserCommand, EmptyCommandResult> createUserService,
+        ICommandService<CreateUserCommand, CreateUserCommandResult> createUserService,
         IPasswordHashProvider hashProvider,
         IJwtService jwtService)
     {
@@ -34,13 +33,13 @@ internal sealed class RegistrationService : IRegistrationService
         User user = _mapper.Map<RegistrationRequest, User>(request)!;
         user.PasswordHash = _hashProvider.Hash(request.Password!);
 
-        await _createUserService.ExecuteAsync(new CreateUserCommand(user));
+        Guid userId = (await _createUserService.ExecuteAsync(new CreateUserCommand(user))).Data.Id;
 
-        string token = _jwtService.GetToken(user.Login);
+        string token = _jwtService.GetToken(userId);
 
         return new RegistrationResponse
         {
-            Login = user.Login,
+            UserId = userId,
             Token = token
         };
     }
