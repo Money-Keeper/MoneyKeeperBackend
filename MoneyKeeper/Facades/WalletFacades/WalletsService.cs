@@ -31,7 +31,7 @@ internal sealed class WalletsService : IWalletsService
 
     public Task DeleteAsync(Guid id) => _walletCommands.DeleteAsync(id);
 
-    public Task<bool> ExistsAsync(Guid id) => _walletQueries.ExistsAsync(id);
+    public Task<bool> ExistsAsync(Guid id) => _walletQueries.ExistsAsync(id, _userContext.CurrentUserId!.Value);
 
     public async Task<WalletDto?> GetAsync(Guid id)
     {

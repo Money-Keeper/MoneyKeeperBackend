@@ -61,8 +61,7 @@ internal static class AppBuilderConfiguration
             })
             .AddScoped<IQueryService<EntityExistsQuery<Currency>, bool>, EntityExistsQueryService<Currency>>()
             .AddScoped<IQueryService<EntityExistsQuery<Category>, bool>, EntityExistsQueryService<Category>>()
-            .AddScoped<IQueryService<EntityExistsQuery<Expense>, bool>, EntityExistsQueryService<Expense>>()
-            .AddScoped<IQueryService<EntityExistsQuery<Wallet>, bool>, EntityExistsQueryService<Wallet>>();
+            .AddScoped<IQueryService<EntityExistsQuery<Expense>, bool>, EntityExistsQueryService<Expense>>();
 
         builder.Services
             .AddAutoMapper()

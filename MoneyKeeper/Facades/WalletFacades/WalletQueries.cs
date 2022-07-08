@@ -1,6 +1,5 @@
 ﻿using MoneyKeeper.Domain.Infrastructure.Queries;
 using MoneyKeeper.Domain.Models;
-using MoneyKeeper.Domain.Queries;
 using MoneyKeeper.Domain.Queries.WalletQueries;
 using MoneyKeeper.Facades.WalletFacades.Abstractions;
 
@@ -8,12 +7,12 @@ namespace MoneyKeeper.Facades.WalletFacades;
 
 internal sealed class WalletQueries : IWalletQueries
 {
-    private readonly IQueryService<EntityExistsQuery<Wallet>, bool> _walletExistsService;
+    private readonly IQueryService<WalletExistsQuery, bool> _walletExistsService;
     private readonly IQueryService<GetWalletByIdQuery, Wallet?> _getWalletByIdService;
     private readonly IQueryService<GetWalletsQuery, IEnumerable<Wallet>> _getWalletsByConditionService;
 
     public WalletQueries(
-        IQueryService<EntityExistsQuery<Wallet>, bool> walletExistsService,
+        IQueryService<WalletExistsQuery, bool> walletExistsService,
         IQueryService<GetWalletByIdQuery, Wallet?> getWalletByIdService,
         IQueryService<GetWalletsQuery, IEnumerable<Wallet>> getWalletsByConditionService)
     {
@@ -22,9 +21,9 @@ internal sealed class WalletQueries : IWalletQueries
         _getWalletsByConditionService = getWalletsByConditionService ?? throw new ArgumentNullException(nameof(getWalletsByConditionService));
     }
 
-    public Task<bool> ExistsAsync(Guid id)
+    public Task<bool> ExistsAsync(Guid id, Guid userId)
     {
-        return _walletExistsService.ExecuteAsync(new EntityExistsQuery<Wallet>(id));
+        return _walletExistsService.ExecuteAsync(new WalletExistsQuery(id, userId));
     }
 
     public Task<Wallet?> GetAsync(Guid id, Guid userId)
